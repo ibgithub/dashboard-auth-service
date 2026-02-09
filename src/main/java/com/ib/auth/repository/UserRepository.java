@@ -1,7 +1,6 @@
 package com.ib.auth.repository;
 
 import com.ib.auth.dto.UserDto;
-import com.ib.auth.service.AuthService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -16,54 +15,96 @@ public class UserRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // RowMapper
-    private final RowMapper<UserDto> rowMapper = (rs, rowNum) -> {
+    private final RowMapper<UserDto> userWithPasswordMapper = (rs, rowNum) -> {
         UserDto u = new UserDto();
         u.setId(rs.getLong("id"));
         u.setUsername(rs.getString("username"));
         u.setEmail(rs.getString("email"));
         u.setPassword(rs.getString("password"));
+        u.setRole(rs.getString("role"));
+        return u;
+    };
+
+    private final RowMapper<UserDto> userWithoutPasswordMapper = (rs, rowNum) -> {
+        UserDto u = new UserDto();
+        u.setId(rs.getLong("id"));
+        u.setUsername(rs.getString("username"));
+        u.setEmail(rs.getString("email"));
+        u.setRole(rs.getString("role"));
         return u;
     };
 
     public List<UserDto> findAll() {
         return jdbcTemplate.query(
-                "SELECT id, username, email FROM users",
-                rowMapper
+                "SELECT id, username, email, role FROM auth.users order by id",
+                userWithoutPasswordMapper
         );
     }
 
     public UserDto findById(Long id) {
         return jdbcTemplate.queryForObject(
-                "SELECT id, username, email FROM users WHERE id = ?",
-                rowMapper,
+                "SELECT id, username, email, role FROM auth.users WHERE id = ?",
+                userWithoutPasswordMapper,
                 id
         );
+    }
+    public UserDto findProfileById(Long id) {
+        String sql = "select id, username, email, role " +
+                "from auth.users where id = ? ";
+
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            UserDto u = new UserDto();
+            u.setId(rs.getLong("id"));
+            u.setUsername(rs.getString("username"));
+            u.setEmail(rs.getString("email"));
+            u.setRole(rs.getString("role"));
+            return u;
+        }, id);
     }
 
     public UserDto findByUsername(String username) {
         return jdbcTemplate.queryForObject(
-                "SELECT id, username, email, password FROM auth.users WHERE username = ?",
-                rowMapper,
+                "SELECT id, username, email, password, role FROM auth.users WHERE username = ?",
+                userWithPasswordMapper,
                 username
         );
     }
 
     public int save(UserDto user) {
+        String sqlInsert = "INSERT INTO auth.users (username, email, password, role, created_by) " +
+                "VALUES (?, ?, ?, ?, ?)";
         return jdbcTemplate.update(
-                "INSERT INTO users (username, email) VALUES (?, ?)",
+                sqlInsert,
                 user.getUsername(),
-                user.getEmail()
+                user.getEmail(),
+                user.getPassword(), // sudah bcrypt
+                user.getRole(),
+                user.getCreatedBy()
         );
     }
 
     public int update(UserDto user) {
-        return jdbcTemplate.update(
-                "UPDATE users SET username = ?, email = ? WHERE id = ?",
-                user.getUsername(),
-                user.getEmail(),
-                user.getId()
-        );
+        if (user.getPassword() != null) {
+            String sql = "update auth.users " +
+                    "set email = ?, password = ?, updated_by = ?, updated_date = now() " +
+                    "where id = ? ";
+            return jdbcTemplate.update(
+                    sql,
+                    user.getEmail(),
+                    user.getPassword(),
+                    user.getUpdatedBy(),
+                    user.getId()
+            );
+        } else {
+            String sql = "update auth.users set email = ?, updated_by = ?, updated_date = now() " +
+                    "where id = ? ";
+            return jdbcTemplate.update(
+                    sql,
+                    user.getEmail(),
+                    user.getUpdatedBy(),
+                    user.getId()
+            );
+        }
     }
 
     public int deleteById(Long id) {

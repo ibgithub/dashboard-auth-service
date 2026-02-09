@@ -1,11 +1,15 @@
 package com.ib.auth.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class UserDto {
     private Long id;
     private String username;
     private String email;
     private String password;
     private String role;
+    private String createdBy;
+    private String updatedBy;
 
     public Long getId() {
         return id;
@@ -31,6 +35,7 @@ public class UserDto {
         this.email = email;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
@@ -45,5 +50,21 @@ public class UserDto {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 }
