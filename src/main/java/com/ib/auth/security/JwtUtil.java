@@ -30,6 +30,7 @@ public class JwtUtil {
     public String generateToken(UserDto user) {
         return Jwts.builder()
                 .setSubject(user.getUsername())
+                .claim("userId", user.getId())
                 .claim("role", user.getRole())
                 .setIssuedAt(new Date())
                 .setExpiration(

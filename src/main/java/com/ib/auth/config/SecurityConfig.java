@@ -4,6 +4,7 @@ package com.ib.auth.config;
 import com.ib.auth.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,7 +29,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login/**").permitAll() // ⬅️ KEY LINE
+                        .requestMatchers("/api/auth/login/**").permitAll()
+                        .requestMatchers("/api/users/me").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sm ->

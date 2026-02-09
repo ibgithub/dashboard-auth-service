@@ -51,8 +51,7 @@ public class UserRepository {
     public UserDto findProfileById(Long id) {
         String sql = "select id, username, email, role " +
                 "from auth.users where id = ? ";
-
-        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+        UserDto userDto = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
             UserDto u = new UserDto();
             u.setId(rs.getLong("id"));
             u.setUsername(rs.getString("username"));
@@ -60,6 +59,8 @@ public class UserRepository {
             u.setRole(rs.getString("role"));
             return u;
         }, id);
+
+        return userDto;
     }
 
     public UserDto findByUsername(String username) {
