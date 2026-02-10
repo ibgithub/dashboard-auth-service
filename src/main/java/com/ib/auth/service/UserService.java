@@ -68,4 +68,8 @@ public class UserService {
         }
         return userRepository.findAll();
     }
+    public UserDto getById(Long id) {
+        return userRepository.findProfileById(id);
+    }
+
 }

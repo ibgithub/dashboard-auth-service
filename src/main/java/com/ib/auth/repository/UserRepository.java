@@ -41,24 +41,14 @@ public class UserRepository {
         );
     }
 
-    public UserDto findById(Long id) {
-        return jdbcTemplate.queryForObject(
-                "SELECT id, username, email, role FROM auth.users WHERE id = ?",
-                userWithoutPasswordMapper,
+    public UserDto findProfileById(Long id) {
+        String sql = "select id, username, password, email, role " +
+                "from auth.users where id = ? ";
+        UserDto userDto = jdbcTemplate.queryForObject(
+                sql,
+                userWithPasswordMapper,
                 id
         );
-    }
-    public UserDto findProfileById(Long id) {
-        String sql = "select id, username, email, role " +
-                "from auth.users where id = ? ";
-        UserDto userDto = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
-            UserDto u = new UserDto();
-            u.setId(rs.getLong("id"));
-            u.setUsername(rs.getString("username"));
-            u.setEmail(rs.getString("email"));
-            u.setRole(rs.getString("role"));
-            return u;
-        }, id);
 
         return userDto;
     }

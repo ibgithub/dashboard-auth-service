@@ -3,6 +3,7 @@ package com.ib.auth.controller;
 import com.ib.auth.dto.UserDto;
 import com.ib.auth.security.JwtUser;
 import com.ib.auth.service.UserService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,5 +62,11 @@ public class UserController {
                 .getPrincipal();
 
         return userService.getUsers(jwtUser);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserDto getById(@PathVariable Long id) {
+        return userService.getById(id);
     }
 }
