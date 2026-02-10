@@ -7,6 +7,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -60,4 +62,10 @@ public class UserService {
         return userRepository.findProfileById(loginUser.getUserId());
     }
 
+    public List<UserDto> getUsers(JwtUser loginUser) {
+        if (!"ADMIN".equals(loginUser.getRole())) {
+            throw new AccessDeniedException("Only ADMIN can create user");
+        }
+        return userRepository.findAll();
+    }
 }

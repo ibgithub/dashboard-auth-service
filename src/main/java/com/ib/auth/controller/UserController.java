@@ -6,6 +6,8 @@ import com.ib.auth.service.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -49,5 +51,15 @@ public class UserController {
                 .getPrincipal();
 
         return userService.getMyProfile(jwtUser);
+    }
+
+    @GetMapping
+    public List<UserDto> getUsers() {
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return userService.getUsers(jwtUser);
     }
 }
