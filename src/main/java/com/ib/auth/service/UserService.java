@@ -34,7 +34,7 @@ public class UserService {
 
         request.setCreatedBy(loginUser.getUsername());
 
-        userRepository.save(request);
+        userRepository.insert(request);
     }
     public void updateUser(
             UserDto request,
@@ -83,7 +83,7 @@ public class UserService {
         validateNewPassword(dto);
 
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
-        userRepository.save(user);
+        userRepository.update(user);
     }
 
     public void changePasswordByAdmin(Long userId, ChangePasswordDto dto) {
@@ -92,7 +92,7 @@ public class UserService {
 
         UserDto user = getById(userId);
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
-        userRepository.save(user);
+        userRepository.update(user);
     }
     private void validateNewPassword(ChangePasswordDto dto) {
         if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {

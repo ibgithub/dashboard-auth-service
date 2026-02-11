@@ -61,7 +61,7 @@ public class UserRepository {
         );
     }
 
-    public int save(UserDto user) {
+    public int insert(UserDto user) {
         String sqlInsert = "INSERT INTO auth.users (username, email, password, role, created_by) " +
                 "VALUES (?, ?, ?, ?, ?)";
         return jdbcTemplate.update(
