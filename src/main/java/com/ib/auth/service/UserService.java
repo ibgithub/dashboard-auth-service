@@ -1,5 +1,6 @@
 package com.ib.auth.service;
 
+import com.ib.auth.dto.ChangePasswordDto;
 import com.ib.auth.dto.UserDto;
 import com.ib.auth.repository.UserRepository;
 import com.ib.auth.security.JwtUser;
@@ -71,5 +72,31 @@ public class UserService {
     public UserDto getById(Long id) {
         return userRepository.findProfileById(id);
     }
+    public void changePasswordSelf(Long userId, ChangePasswordDto dto) {
 
+        UserDto user = getById(userId);
+
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            throw new RuntimeException("Password lama salah");
+        }
+
+        validateNewPassword(dto);
+
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    public void changePasswordByAdmin(Long userId, ChangePasswordDto dto) {
+
+        validateNewPassword(dto);
+
+        UserDto user = getById(userId);
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+    }
+    private void validateNewPassword(ChangePasswordDto dto) {
+        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            throw new RuntimeException("Password tidak sama");
+        }
+    }
 }
