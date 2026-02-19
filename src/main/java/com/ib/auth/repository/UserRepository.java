@@ -100,7 +100,7 @@ public class UserRepository {
 
     public int deleteById(Long id) {
         return jdbcTemplate.update(
-                "DELETE FROM users WHERE id = ?",
+                "DELETE FROM auth.users WHERE id = ?",
                 id
         );
     }

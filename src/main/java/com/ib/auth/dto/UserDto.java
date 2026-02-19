@@ -1,7 +1,5 @@
 package com.ib.auth.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class UserDto {
     private Long id;
     private String username;
@@ -35,7 +33,6 @@ public class UserDto {
         this.email = email;
     }
 
-    @JsonIgnore
     public String getPassword() {
         return password;
     }
