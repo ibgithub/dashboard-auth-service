@@ -40,6 +40,15 @@ public class UserRepository {
                 userWithoutPasswordMapper
         );
     }
+    public List<UserDto> findByRole(String role) {
+        String sql = "SELECT id, username, email, role FROM auth.users " +
+                "where role = ? order by id";
+        return jdbcTemplate.query(
+                sql,
+                userWithoutPasswordMapper,
+                role
+        );
+    }
 
     public UserDto findProfileById(Long id) {
         String sql = "select id, username, password, email, role " +

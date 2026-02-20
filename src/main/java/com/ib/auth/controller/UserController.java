@@ -65,6 +65,11 @@ public class UserController {
         return userService.getUsers(jwtUser);
     }
 
+    @GetMapping("/byRole/{role}")
+    public List<UserDto> getUsersByRole(@PathVariable String role) {
+        return userService.getUsersByRole(role);
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public UserDto getById(@PathVariable Long id) {

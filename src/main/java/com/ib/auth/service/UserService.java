@@ -69,6 +69,10 @@ public class UserService {
         }
         return userRepository.findAll();
     }
+
+    public List<UserDto> getUsersByRole(String role) {
+        return userRepository.findByRole(role);
+    }
     public UserDto getById(Long id) {
         return userRepository.findProfileById(id);
     }
