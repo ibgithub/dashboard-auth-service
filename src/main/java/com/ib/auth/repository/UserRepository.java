@@ -86,7 +86,7 @@ public class UserRepository {
     public int update(UserDto user) {
         if (user.getPassword() != null) {
             String sql = "update auth.users " +
-                    "set email = ?, password = ?, updated_by = ?, updated_date = now() " +
+                    "set email = ?, password = ?, updated_by = ?, updated_at = now() " +
                     "where id = ? ";
             return jdbcTemplate.update(
                     sql,
@@ -96,7 +96,7 @@ public class UserRepository {
                     user.getId()
             );
         } else {
-            String sql = "update auth.users set email = ?, updated_by = ?, updated_date = now() " +
+            String sql = "update auth.users set email = ?, updated_by = ?, updated_at = now() " +
                     "where id = ? ";
             return jdbcTemplate.update(
                     sql,
