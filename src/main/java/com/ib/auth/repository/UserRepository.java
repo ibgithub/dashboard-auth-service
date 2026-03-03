@@ -80,11 +80,11 @@ public class UserRepository {
         String sqlSelect = sql;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or upper(u.first_name) like CONCAT('%', ?, '%') or upper(u.last_name) like CONCAT('%', ?, '%') " +
+            sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or upper(u.first_name) like CONCAT('%', ?, '%') or upper(u.last_name) like CONCAT('%', ?, '%') or upper(u.role) like CONCAT('%', ?, '%') " +
                     " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,
                     userWithoutPasswordMapper,
-                    keyword, keyword,
+                    keyword, keyword, keyword, keyword,
                     limit, offset);
         }
         sqlSelect += " LIMIT ? OFFSET ? ";
@@ -98,7 +98,7 @@ public class UserRepository {
         String sqlSelectCount = sqlCount;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlSelectCount += " where upper(u.username) like CONCAT('%" + keyword + "%') or upper(u.first_name) like CONCAT('%" + keyword + "%') or upper(u.last_name) like CONCAT('%" + keyword + "%') ";
+            sqlSelectCount += " where upper(u.username) like CONCAT('%" + keyword + "%') or upper(u.first_name) like CONCAT('%" + keyword + "%') or upper(u.last_name) like CONCAT('%" + keyword + "%') or upper(u.role) like CONCAT('%" + keyword + "%') ";
             return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
         }
         return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
@@ -123,14 +123,22 @@ public class UserRepository {
     }
 
     public int insert(UserDto user) {
-        String sqlInsert = "INSERT INTO auth.users (username, email, password, role, created_by) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String sqlInsert = "INSERT INTO auth.users (" +
+                "username, first_name, last_name, phone_number, email, " +
+                "password, role, app_lang, created_by) " +
+                "VALUES (?, ?, ?, ?, ?," +
+                "?, ?, ?, ?)";
         return jdbcTemplate.update(
                 sqlInsert,
                 user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getPhoneNumber(),
                 user.getEmail(),
+
                 user.getPassword(), // sudah bcrypt
                 user.getRole(),
+                user.getAppLang(),
                 user.getCreatedBy()
         );
     }
@@ -138,22 +146,24 @@ public class UserRepository {
     public int update(UserDto user) {
         if (user.getPassword() != null) {
             String sql = "update auth.users " +
-                    "set email = ?, password = ?, updated_by = ?, updated_at = now() " +
+                    "set first_name = ?, last_name = ?, email = ?, phone_number = ?, role = ?, " +
+                    "app_lang = ?, updated_by = ?, updated_at = now(), password = ? " +
                     "where id = ? ";
             return jdbcTemplate.update(
                     sql,
-                    user.getEmail(),
-                    user.getPassword(),
-                    user.getUpdatedBy(),
+                    user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(), user.getRole(),
+                    user.getAppLang(), user.getUpdatedBy(), user.getPassword(),
                     user.getId()
             );
         } else {
-            String sql = "update auth.users set email = ?, updated_by = ?, updated_at = now() " +
+            String sql = "update auth.users " +
+                    "set first_name = ?, last_name = ?, email = ?, phone_number = ?, role = ?, " +
+                    "app_lang = ?, updated_by = ?, updated_at = now() " +
                     "where id = ? ";
             return jdbcTemplate.update(
                     sql,
-                    user.getEmail(),
-                    user.getUpdatedBy(),
+                    user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(), user.getRole(),
+                    user.getAppLang(), user.getUpdatedBy(),
                     user.getId()
             );
         }

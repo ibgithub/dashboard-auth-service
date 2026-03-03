@@ -64,11 +64,6 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
 
-        JwtUser jwtUser = (JwtUser) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-
         PageResult<UserDto> result;
 
         result = userService.findPaged(page, size, keyword);
