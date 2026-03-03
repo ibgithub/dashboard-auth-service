@@ -1,7 +1,6 @@
 package com.ib.auth.repository;
 
 import com.ib.auth.dto.UserDto;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -28,12 +27,17 @@ public class UserRepository {
         u.setEmail(rs.getString("email"));
         u.setPassword(rs.getString("password"));
         u.setRole(rs.getString("role"));
-        u.setFirstName(rs.getString("first_name"));
-        u.setLastName(rs.getString("last_name"));
         u.setPhoneNumber(rs.getString("phone_number"));
         u.setAppLang(rs.getString("app_lang"));
         u.setAppRowPerPage(rs.getString("app_row_per_page"));
-        u.setFullName(u.getFirstName() + " " + u.getLastName());
+        String firstName = rs.getString("first_name");
+        String lastName = rs.getString("last_name");
+        firstName = (firstName == null ? "" : firstName);
+        lastName = (lastName == null ? "" : lastName);
+        String fullName = firstName + (lastName.isEmpty() ? "" : " " + lastName);
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
+        u.setFullName(fullName);
         return u;
     };
 
@@ -43,27 +47,30 @@ public class UserRepository {
         u.setUsername(rs.getString("username"));
         u.setEmail(rs.getString("email"));
         u.setRole(rs.getString("role"));
-        u.setFirstName(rs.getString("first_name"));
-        u.setLastName(rs.getString("last_name"));
         u.setPhoneNumber(rs.getString("phone_number"));
         u.setAppLang(rs.getString("app_lang"));
         u.setAppRowPerPage(rs.getString("app_row_per_page"));
-        u.setFullName(u.getFirstName() + " " + u.getLastName());
+        String firstName = rs.getString("first_name");
+        String lastName = rs.getString("last_name");
+        firstName = (firstName == null ? "" : firstName);
+        lastName = (lastName == null ? "" : lastName);
+        String fullName = firstName + (lastName.isEmpty() ? "" : " " + lastName);
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
+        u.setFullName(fullName);
         return u;
     };
 
     public List<UserDto> findAll() {
         return jdbcTemplate.query(
-                "SELECT id, username, email, role FROM auth.users order by id",
+                sql + " order by id",
                 userWithoutPasswordMapper
         );
     }
 
     public List<UserDto> findByRole(String role) {
-        String sql = "SELECT id, username, email, role FROM auth.users " +
-                "where role = ? order by id";
         return jdbcTemplate.query(
-                sql,
+                sql + " where role = ? order by id",
                 userWithoutPasswordMapper,
                 role
         );
@@ -76,14 +83,14 @@ public class UserRepository {
             sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or upper(u.first_name) like CONCAT('%', ?, '%') or upper(u.last_name) like CONCAT('%', ?, '%') " +
                     " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,
-                    new BeanPropertyRowMapper<>(UserDto.class),
+                    userWithoutPasswordMapper,
                     keyword, keyword,
                     limit, offset);
         }
         sqlSelect += " LIMIT ? OFFSET ? ";
 
         return jdbcTemplate.query(sqlSelect,
-                new BeanPropertyRowMapper<>(UserDto.class),
+                userWithoutPasswordMapper,
                 limit, offset);
     }
 
@@ -98,10 +105,8 @@ public class UserRepository {
     }
 
     public UserDto findProfileById(Long id) {
-        String sql = "select id, username, password, email, role, first_name, last_name, phone_number, app_lang, app_row_per_page " +
-                "from auth.users where id = ? ";
         UserDto userDto = jdbcTemplate.queryForObject(
-                sql,
+                sql + " where id = ? ",
                 userWithPasswordMapper,
                 id
         );
@@ -111,8 +116,7 @@ public class UserRepository {
 
     public UserDto findByUsername(String username) {
         return jdbcTemplate.queryForObject(
-                "SELECT id, username, email, password, role, first_name, last_name, phone_number, app_lang, app_row_per_page " +
-                    "FROM auth.users WHERE username = ?",
+                sql + " WHERE username = ?",
                 userWithPasswordMapper,
                 username
         );
