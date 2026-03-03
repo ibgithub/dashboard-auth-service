@@ -1,5 +1,6 @@
 package com.ib.auth.service;
 
+import com.ib.auth.common.PageResult;
 import com.ib.auth.dto.ChangePasswordDto;
 import com.ib.auth.dto.UserDto;
 import com.ib.auth.repository.UserRepository;
@@ -68,6 +69,16 @@ public class UserService {
             throw new AccessDeniedException("Only ADMIN can create user");
         }
         return userRepository.findAll();
+    }
+
+    public PageResult<UserDto> findPaged(int page, int size, String keyword) {
+
+        int offset = page * size;
+
+        List<UserDto> users = userRepository.findAll(size, offset, keyword);
+        int total = userRepository.countAll(keyword);
+
+        return new PageResult<>(users, page, size, total);
     }
 
     public List<UserDto> getUsersByRole(String role) {

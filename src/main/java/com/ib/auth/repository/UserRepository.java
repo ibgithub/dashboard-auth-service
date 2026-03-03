@@ -1,6 +1,7 @@
 package com.ib.auth.repository;
 
 import com.ib.auth.dto.UserDto;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,11 @@ import java.util.List;
 @Repository
 public class UserRepository {
     private final JdbcTemplate jdbcTemplate;
+    String sql = "select u.id, u.username, u.password, u.email, u.role, " +
+            "u.first_name, u.last_name, u.phone_number, u.app_lang, u.app_row_per_page " +
+            "from auth.users u ";
+    String sqlCount = "select count(1) " +
+            "from auth.users u ";
 
     public UserRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -22,6 +28,12 @@ public class UserRepository {
         u.setEmail(rs.getString("email"));
         u.setPassword(rs.getString("password"));
         u.setRole(rs.getString("role"));
+        u.setFirstName(rs.getString("first_name"));
+        u.setLastName(rs.getString("last_name"));
+        u.setPhoneNumber(rs.getString("phone_number"));
+        u.setAppLang(rs.getString("app_lang"));
+        u.setAppRowPerPage(rs.getString("app_row_per_page"));
+        u.setFullName(u.getFirstName() + " " + u.getLastName());
         return u;
     };
 
@@ -31,6 +43,12 @@ public class UserRepository {
         u.setUsername(rs.getString("username"));
         u.setEmail(rs.getString("email"));
         u.setRole(rs.getString("role"));
+        u.setFirstName(rs.getString("first_name"));
+        u.setLastName(rs.getString("last_name"));
+        u.setPhoneNumber(rs.getString("phone_number"));
+        u.setAppLang(rs.getString("app_lang"));
+        u.setAppRowPerPage(rs.getString("app_row_per_page"));
+        u.setFullName(u.getFirstName() + " " + u.getLastName());
         return u;
     };
 
@@ -40,6 +58,7 @@ public class UserRepository {
                 userWithoutPasswordMapper
         );
     }
+
     public List<UserDto> findByRole(String role) {
         String sql = "SELECT id, username, email, role FROM auth.users " +
                 "where role = ? order by id";
@@ -50,8 +69,36 @@ public class UserRepository {
         );
     }
 
+    public List<UserDto> findAll(int limit, int offset, String keyword) {
+        String sqlSelect = sql;
+        if (keyword != null && !keyword.equals("")) {
+            keyword = keyword.toUpperCase();
+            sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or upper(u.first_name) like CONCAT('%', ?, '%') or upper(u.last_name) like CONCAT('%', ?, '%') " +
+                    " LIMIT ? OFFSET ? ";
+            return jdbcTemplate.query(sqlSelect,
+                    new BeanPropertyRowMapper<>(UserDto.class),
+                    keyword, keyword,
+                    limit, offset);
+        }
+        sqlSelect += " LIMIT ? OFFSET ? ";
+
+        return jdbcTemplate.query(sqlSelect,
+                new BeanPropertyRowMapper<>(UserDto.class),
+                limit, offset);
+    }
+
+    public int countAll(String keyword) {
+        String sqlSelectCount = sqlCount;
+        if (keyword != null && !keyword.equals("")) {
+            keyword = keyword.toUpperCase();
+            sqlSelectCount += " where upper(u.username) like CONCAT('%" + keyword + "%') or upper(u.first_name) like CONCAT('%" + keyword + "%') or upper(u.last_name) like CONCAT('%" + keyword + "%') ";
+            return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
+        }
+        return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
+    }
+
     public UserDto findProfileById(Long id) {
-        String sql = "select id, username, password, email, role " +
+        String sql = "select id, username, password, email, role, first_name, last_name, phone_number, app_lang, app_row_per_page " +
                 "from auth.users where id = ? ";
         UserDto userDto = jdbcTemplate.queryForObject(
                 sql,
@@ -64,7 +111,8 @@ public class UserRepository {
 
     public UserDto findByUsername(String username) {
         return jdbcTemplate.queryForObject(
-                "SELECT id, username, email, password, role FROM auth.users WHERE username = ?",
+                "SELECT id, username, email, password, role, first_name, last_name, phone_number, app_lang, app_row_per_page " +
+                    "FROM auth.users WHERE username = ?",
                 userWithPasswordMapper,
                 username
         );
