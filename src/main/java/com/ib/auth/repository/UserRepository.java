@@ -15,6 +15,7 @@ public class UserRepository {
             "from auth.users u ";
     String sqlCount = "select count(1) " +
             "from auth.users u ";
+    String order_by = " order by u.first_name, u.last_name ";
 
     public UserRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -63,14 +64,14 @@ public class UserRepository {
 
     public List<UserDto> findAll() {
         return jdbcTemplate.query(
-                sql + " order by id",
+                sql + order_by,
                 userWithoutPasswordMapper
         );
     }
 
     public List<UserDto> findByRole(String role) {
         return jdbcTemplate.query(
-                sql + " where role = ? order by id",
+                sql + " where role = ? " + order_by,
                 userWithoutPasswordMapper,
                 role
         );
@@ -80,7 +81,8 @@ public class UserRepository {
         String sqlSelect = sql;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlSelect += " where upper(u.username) like CONCAT('%', ?, '%') or upper(u.first_name) like CONCAT('%', ?, '%') or upper(u.last_name) like CONCAT('%', ?, '%') or upper(u.role) like CONCAT('%', ?, '%') " +
+            sqlSelect += " where ( upper(u.username) like CONCAT('%', ?, '%') or upper(u.first_name) like CONCAT('%', ?, '%') or upper(u.last_name) like CONCAT('%', ?, '%') or upper(u.role) like CONCAT('%', ?, '%') ) " +
+                    order_by +
                     " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,
                     userWithoutPasswordMapper,
@@ -98,7 +100,7 @@ public class UserRepository {
         String sqlSelectCount = sqlCount;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlSelectCount += " where upper(u.username) like CONCAT('%" + keyword + "%') or upper(u.first_name) like CONCAT('%" + keyword + "%') or upper(u.last_name) like CONCAT('%" + keyword + "%') or upper(u.role) like CONCAT('%" + keyword + "%') ";
+            sqlSelectCount += " where ( upper(u.username) like CONCAT('%" + keyword + "%') or upper(u.first_name) like CONCAT('%" + keyword + "%') or upper(u.last_name) like CONCAT('%" + keyword + "%') or upper(u.role) like CONCAT('%" + keyword + "%') ) ";
             return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
         }
         return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
