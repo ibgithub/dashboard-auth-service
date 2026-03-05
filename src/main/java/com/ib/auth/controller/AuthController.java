@@ -1,13 +1,10 @@
 package com.ib.auth.controller;
 
 import com.ib.auth.dto.JwtResponse;
-import com.ib.auth.dto.UserDto;
 import com.ib.auth.entity.LoginRequest;
-import com.ib.auth.security.JwtUser;
 import com.ib.auth.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;

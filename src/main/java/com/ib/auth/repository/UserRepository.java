@@ -117,11 +117,14 @@ public class UserRepository {
     }
 
     public UserDto findByUsername(String username) {
-        return jdbcTemplate.queryForObject(
+
+        List<UserDto> users = jdbcTemplate.query(
                 sql + " WHERE username = ?",
                 userWithPasswordMapper,
                 username
         );
+
+        return users.isEmpty() ? null : users.get(0);
     }
 
     public int insert(UserDto user) {
