@@ -1,0 +1,13 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/temanumkm
+    username: temanumkm_user
+    password: GantiPasswordKuat123!
+jwt:
+  secret: my-super-secret-key-minimum-32-bytes!!!
+  expiration: 3600000 # 1 jam
