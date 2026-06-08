@@ -119,8 +119,9 @@ public class UserRepository {
     public UserDto findByUsername(String username) {
 
         List<UserDto> users = jdbcTemplate.query(
-                sql + " WHERE username = ?",
+                sql + " WHERE username = ? or phone_number = ? ",
                 userWithPasswordMapper,
+                username,
                 username
         );
 

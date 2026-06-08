@@ -25,23 +25,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+
+        return path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/api-docs")
+                || path.equals("/swagger")
+                || path.startsWith("/swagger/")
+                ;
+
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String path = request.getRequestURI();
-
-        if (path.startsWith("/api/auth/login")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-//            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             filterChain.doFilter(request, response);
             return;
         }
@@ -50,11 +55,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             Claims claims = jwtUtil.validateToken(token);
-            String username = claims.getSubject();        // sub
-            String role = claims.get("role", String.class); // ADMIN / USER
+            String username = claims.getSubject();
+            String role = claims.get("role", String.class);
             Long userId = claims.get("userId", Long.class);
 
-            // 🔑 ROLE HARUS pakai prefix ROLE_
             List<SimpleGrantedAuthority> authorities =
                     List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
@@ -67,18 +71,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             authorities
                     );
 
-            // 🔥 INI KUNCI UTAMA
-            SecurityContextHolder.getContext()
-                    .setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            System.out.println("AUTH = " +
-                    SecurityContextHolder.getContext().getAuthentication());
-
-            filterChain.doFilter(request, response);
         } catch (Exception e) {
             SecurityContextHolder.clearContext();
-            e.printStackTrace();
-//            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
+
+        filterChain.doFilter(request, response);
     }
 }

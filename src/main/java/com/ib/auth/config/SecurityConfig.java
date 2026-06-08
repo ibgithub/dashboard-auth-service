@@ -16,6 +16,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig {
+    private static final String[] SWAGGER_WHITELIST = {
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/v3/api-docs",
+            "/api-docs/**",
+            "/api-docs",
+            "/swagger",
+            "/swagger/**"
+    };
 
     private final JwtAuthenticationFilter jwtFilter;
 
@@ -29,7 +39,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login/**").permitAll()
+                        .requestMatchers(SWAGGER_WHITELIST).permitAll().requestMatchers("/api/auth/login/**").permitAll()
                         .requestMatchers("/api/users/me").authenticated()
 
                         .requestMatchers(HttpMethod.GET,  "/api/users/me").authenticated()
