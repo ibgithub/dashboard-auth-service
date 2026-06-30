@@ -5,9 +5,9 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/c0f
-    username: c0f
-    password: c0f
+    url: jdbc:postgresql://localhost:5432/ml_dashboard
+    username: ml_user
+    password: ml_user
 jwt:
   secret: my-super-secret-key-minimum-32-bytes!!!
   expiration: 3600000 # 1 jam
@@ -19,3 +19,6 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
     display-request-duration: true
+
+cors:
+  allowed-origins: http://localhost:3000,http://localhost:5173

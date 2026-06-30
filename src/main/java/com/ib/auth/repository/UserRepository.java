@@ -97,13 +97,17 @@ public class UserRepository {
     }
 
     public int countAll(String keyword) {
-        String sqlSelectCount = sqlCount;
-        if (keyword != null && !keyword.equals("")) {
+        if (keyword != null && !keyword.isEmpty()) {
             keyword = keyword.toUpperCase();
-            sqlSelectCount += " where ( upper(u.username) like CONCAT('%" + keyword + "%') or upper(u.first_name) like CONCAT('%" + keyword + "%') or upper(u.last_name) like CONCAT('%" + keyword + "%') or upper(u.role) like CONCAT('%" + keyword + "%') ) ";
-            return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
+            String sqlSelectCount = sqlCount +
+                " where ( upper(u.username) like CONCAT('%', ?, '%') " +
+                "or upper(u.first_name) like CONCAT('%', ?, '%') " +
+                "or upper(u.last_name) like CONCAT('%', ?, '%') " +
+                "or upper(u.role) like CONCAT('%', ?, '%') ) ";
+            return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class,
+                keyword, keyword, keyword, keyword);
         }
-        return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class);
+        return jdbcTemplate.queryForObject(sqlCount, Integer.class);
     }
 
     public UserDto findProfileById(Long id) {

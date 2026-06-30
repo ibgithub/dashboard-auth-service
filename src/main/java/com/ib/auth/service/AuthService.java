@@ -1,6 +1,7 @@
 package com.ib.auth.service;
 
 import com.ib.auth.dto.UserDto;
+import com.ib.auth.exception.AuthenticationException;
 import com.ib.auth.repository.UserRepository;
 import com.ib.auth.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,7 +27,7 @@ public class AuthService {
         UserDto user = userRepository.findByUsername(username);
 
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid username or password");
+            throw new AuthenticationException("Username atau password salah");
         }
 
         return jwtUtil.generateToken(user);
