@@ -10,7 +10,6 @@ import com.ib.auth.security.JwtUser;
 import com.ib.auth.service.RoleService;
 import com.ib.auth.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,39 +28,28 @@ public class UserController {
     }
 
     @PostMapping
-    public void createUser(@RequestBody UserDto request) {
-
-        JwtUser jwtUser = (JwtUser) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-
+    public ResponseEntity<ApiResponse<Void>> createUser(@RequestBody UserDto request) {
+        JwtUser jwtUser = getJwtUser();
         userService.createUser(request, jwtUser);
+        return ResponseEntity.ok(new ApiResponse<>(true, "CREATED", "User created successfully", null));
     }
 
     @PutMapping("/{id}")
-    public void updateUser(
+    public ResponseEntity<ApiResponse<Void>> updateUser(
             @PathVariable Long id,
             @RequestBody UserDto request
     ) {
-        JwtUser jwtUser = (JwtUser) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-
+        JwtUser jwtUser = getJwtUser();
         request.setId(id);
         userService.updateUser(request, jwtUser);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User updated successfully", null));
     }
 
     @GetMapping("/me")
-    public UserDto getMyProfile() {
-
-        JwtUser jwtUser = (JwtUser) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        return userService.getMyProfile(jwtUser);
+    public ResponseEntity<ApiResponse<UserDto>> getMyProfile() {
+        JwtUser jwtUser = getJwtUser();
+        UserDto user = userService.getMyProfile(jwtUser);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Profile fetched successfully", user));
     }
 
     @GetMapping
@@ -69,82 +57,67 @@ public class UserController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
-
-        PageResult<UserDto> result;
-
-        result = userService.findPaged(page, size, keyword);
-
-        ApiResponse<PageResult<UserDto>> response =
-                new ApiResponse<>(
-                        true,
-                        "SUCCESS",
-                        "Users fetched successfully",
-                        result
-                );
-        return ResponseEntity.ok(response);
+        PageResult<UserDto> result = userService.findPaged(page, size, keyword);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Users fetched successfully", result));
     }
 
     @GetMapping("/byRole/{role}")
-    public List<UserDto> getUsersByRole(@PathVariable String role) {
-        return userService.getUsersByRole(role);
+    public ResponseEntity<ApiResponse<List<UserDto>>> getUsersByRole(@PathVariable String role) {
+        List<UserDto> users = userService.getUsersByRole(role);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Users fetched successfully", users));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public UserDto getById(@PathVariable Long id) {
-        return userService.getById(id);
+    public ResponseEntity<ApiResponse<UserDto>> getById(@PathVariable Long id) {
+        UserDto user = userService.getById(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User fetched successfully", user));
     }
 
     @PutMapping("/me/password")
-    public void changePasswordSelf(
-            @RequestBody ChangePasswordDto request
-    ) {
-        JwtUser jwtUser = (JwtUser) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+    public ResponseEntity<ApiResponse<Void>> changePasswordSelf(@RequestBody ChangePasswordDto request) {
+        JwtUser jwtUser = getJwtUser();
         userService.changePasswordSelf(jwtUser.getUserId(), request);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Password changed successfully", null));
     }
 
     @PutMapping("/{id}/password")
-    public void changePasswordByAdmin(
+    public ResponseEntity<ApiResponse<Void>> changePasswordByAdmin(
             @PathVariable Long id,
             @RequestBody ChangePasswordDto request
     ) {
         userService.changePasswordByAdmin(id, request);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Password changed successfully", null));
     }
 
-    // GET /api/users/me/menus - menu yang bisa diakses user yang login (tree structure)
     @GetMapping("/me/menus")
-    public List<MenuDto> getMyMenus() {
-        JwtUser jwtUser = (JwtUser) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return roleService.getUserMenus(jwtUser.getUserId());
+    public ResponseEntity<ApiResponse<List<MenuDto>>> getMyMenus() {
+        JwtUser jwtUser = getJwtUser();
+        List<MenuDto> menus = roleService.getUserMenus(jwtUser.getUserId());
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Menus fetched successfully", menus));
     }
 
-    // GET /api/users/me/roles - daftar role user yang login
     @GetMapping("/me/roles")
-    public List<RoleDto> getMyRoles() {
-        JwtUser jwtUser = (JwtUser) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return roleService.getUserRoles(jwtUser.getUserId());
+    public ResponseEntity<ApiResponse<List<RoleDto>>> getMyRoles() {
+        JwtUser jwtUser = getJwtUser();
+        List<RoleDto> roles = roleService.getUserRoles(jwtUser.getUserId());
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Roles fetched successfully", roles));
     }
 
-    // PUT /api/users/{id}/roles - set roles untuk user (admin only)
     @PutMapping("/{id}/roles")
-    public List<RoleDto> setUserRoles(
+    public ResponseEntity<ApiResponse<List<RoleDto>>> setUserRoles(
             @PathVariable Long id,
             @RequestBody Map<String, List<Long>> body
     ) {
         List<Long> roleIds = body.getOrDefault("roleIds", List.of());
-        JwtUser jwtUser = (JwtUser) SecurityContextHolder
+        JwtUser jwtUser = getJwtUser();
+        List<RoleDto> roles = roleService.setUserRoles(id, roleIds, jwtUser.getUsername());
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User roles updated successfully", roles));
+    }
+
+    private JwtUser getJwtUser() {
+        return (JwtUser) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        return roleService.setUserRoles(id, roleIds, jwtUser.getUsername());
     }
 }

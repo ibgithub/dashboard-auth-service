@@ -1,5 +1,6 @@
 package com.ib.auth.controller;
 
+import com.ib.auth.common.ApiResponse;
 import com.ib.auth.dto.MenuDto;
 import com.ib.auth.dto.RoleDto;
 import com.ib.auth.security.JwtUser;
@@ -21,54 +22,53 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    // GET /api/roles - daftar semua role
     @GetMapping
-    public List<RoleDto> getAllRoles() {
-        return roleService.getAllRoles();
+    public ResponseEntity<ApiResponse<List<RoleDto>>> getAllRoles() {
+        List<RoleDto> roles = roleService.getAllRoles();
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Roles fetched successfully", roles));
     }
 
-    // GET /api/roles/{id} - detail role
     @GetMapping("/{id}")
-    public RoleDto getRoleById(@PathVariable Long id) {
-        return roleService.getRoleById(id);
+    public ResponseEntity<ApiResponse<RoleDto>> getRoleById(@PathVariable Long id) {
+        RoleDto role = roleService.getRoleById(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Role fetched successfully", role));
     }
 
-    // POST /api/roles - buat role baru
     @PostMapping
-    public RoleDto createRole(@RequestBody RoleDto request) {
+    public ResponseEntity<ApiResponse<RoleDto>> createRole(@RequestBody RoleDto request) {
         String username = getCurrentUsername();
-        return roleService.createRole(request, username);
+        RoleDto role = roleService.createRole(request, username);
+        return ResponseEntity.ok(new ApiResponse<>(true, "CREATED", "Role created successfully", role));
     }
 
-    // PUT /api/roles/{id} - update role
     @PutMapping("/{id}")
-    public RoleDto updateRole(@PathVariable Long id, @RequestBody RoleDto request) {
+    public ResponseEntity<ApiResponse<RoleDto>> updateRole(@PathVariable Long id, @RequestBody RoleDto request) {
         String username = getCurrentUsername();
-        return roleService.updateRole(id, request, username);
+        RoleDto role = roleService.updateRole(id, request, username);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Role updated successfully", role));
     }
 
-    // DELETE /api/roles/{id} - hapus role
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteRole(@PathVariable Long id) {
         roleService.deleteRole(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Role deleted successfully", null));
     }
 
-    // GET /api/roles/{id}/menus - daftar menu yang dimiliki role
     @GetMapping("/{id}/menus")
-    public List<MenuDto> getRoleMenus(@PathVariable Long id) {
-        return roleService.getRoleMenus(id);
+    public ResponseEntity<ApiResponse<List<MenuDto>>> getRoleMenus(@PathVariable Long id) {
+        List<MenuDto> menus = roleService.getRoleMenus(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Role menus fetched successfully", menus));
     }
 
-    // PUT /api/roles/{id}/menus - set menus untuk role (replace strategy)
     @PutMapping("/{id}/menus")
-    public List<MenuDto> setRoleMenus(
+    public ResponseEntity<ApiResponse<List<MenuDto>>> setRoleMenus(
             @PathVariable Long id,
             @RequestBody Map<String, List<Long>> body
     ) {
         List<Long> menuIds = body.getOrDefault("menuIds", List.of());
         String username = getCurrentUsername();
-        return roleService.setRoleMenus(id, menuIds, username);
+        List<MenuDto> menus = roleService.setRoleMenus(id, menuIds, username);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Role menus updated successfully", menus));
     }
 
     private String getCurrentUsername() {

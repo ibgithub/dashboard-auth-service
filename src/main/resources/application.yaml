@@ -5,7 +5,7 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/ml_dashboard
+    url: jdbc:postgresql://127.0.0.1:5432/ml_dashboard
     username: ml_user
     password: ml_user
 jwt:
