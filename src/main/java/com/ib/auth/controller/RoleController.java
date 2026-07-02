@@ -1,6 +1,7 @@
 package com.ib.auth.controller;
 
 import com.ib.auth.common.ApiResponse;
+import com.ib.auth.common.PageResult;
 import com.ib.auth.dto.MenuDto;
 import com.ib.auth.dto.RoleDto;
 import com.ib.auth.security.JwtUser;
@@ -23,9 +24,12 @@ public class RoleController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<RoleDto>>> getAllRoles() {
-        List<RoleDto> roles = roleService.getAllRoles();
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Roles fetched successfully", roles));
+    public ResponseEntity<ApiResponse<PageResult<RoleDto>>> getAllRoles(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword) {
+        PageResult<RoleDto> result = roleService.findPaged(page, size, keyword);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Roles fetched successfully", result));
     }
 
     @GetMapping("/{id}")

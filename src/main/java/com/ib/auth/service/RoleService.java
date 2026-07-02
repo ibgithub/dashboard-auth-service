@@ -1,5 +1,6 @@
 package com.ib.auth.service;
 
+import com.ib.auth.common.PageResult;
 import com.ib.auth.dto.MenuDto;
 import com.ib.auth.dto.RoleDto;
 import com.ib.auth.repository.MenuRepository;
@@ -26,6 +27,13 @@ public class RoleService {
 
     public List<RoleDto> getAllRoles() {
         return roleRepository.findAll();
+    }
+
+    public PageResult<RoleDto> findPaged(int page, int size, String keyword) {
+        int offset = page * size;
+        List<RoleDto> roles = roleRepository.findAll(size, offset, keyword);
+        int total = roleRepository.countAll(keyword);
+        return new PageResult<>(roles, page, size, total);
     }
 
     public RoleDto getRoleById(Long id) {

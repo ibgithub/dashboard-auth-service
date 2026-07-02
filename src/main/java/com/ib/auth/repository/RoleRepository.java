@@ -33,6 +33,34 @@ public class RoleRepository {
         );
     }
 
+    public List<RoleDto> findAll(int limit, int offset, String keyword) {
+        if (keyword != null && !keyword.isEmpty()) {
+            keyword = keyword.toUpperCase();
+            String sql = "SELECT id, role_name, description FROM auth.roles " +
+                    "WHERE upper(role_name) LIKE CONCAT('%', ?, '%') " +
+                    "OR upper(description) LIKE CONCAT('%', ?, '%') " +
+                    "ORDER BY role_name LIMIT ? OFFSET ?";
+            return jdbcTemplate.query(sql, roleMapper, keyword, keyword, limit, offset);
+        }
+        return jdbcTemplate.query(
+                "SELECT id, role_name, description FROM auth.roles ORDER BY role_name LIMIT ? OFFSET ?",
+                roleMapper, limit, offset
+        );
+    }
+
+    public int countAll(String keyword) {
+        if (keyword != null && !keyword.isEmpty()) {
+            keyword = keyword.toUpperCase();
+            String sql = "SELECT count(1) FROM auth.roles " +
+                    "WHERE upper(role_name) LIKE CONCAT('%', ?, '%') " +
+                    "OR upper(description) LIKE CONCAT('%', ?, '%')";
+            Integer count = jdbcTemplate.queryForObject(sql, Integer.class, keyword, keyword);
+            return count != null ? count : 0;
+        }
+        Integer count = jdbcTemplate.queryForObject("SELECT count(1) FROM auth.roles", Integer.class);
+        return count != null ? count : 0;
+    }
+
     public RoleDto findById(Long id) {
         List<RoleDto> roles = jdbcTemplate.query(
                 "SELECT id, role_name, description FROM auth.roles WHERE id = ?",
