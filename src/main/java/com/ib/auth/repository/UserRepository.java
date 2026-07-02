@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public class UserRepository {
     private final JdbcTemplate jdbcTemplate;
-    String sql = "select u.id, u.username, u.password, u.email, u.role, " +
+    String sql = "select u.id, u.username, u.password, u.email, " +
             "u.first_name, u.last_name, u.phone_number, u.app_lang, u.app_row_per_page " +
             "from auth.users u ";
     String sqlCount = "select count(1) " +
@@ -27,7 +27,6 @@ public class UserRepository {
         u.setUsername(rs.getString("username"));
         u.setEmail(rs.getString("email"));
         u.setPassword(rs.getString("password"));
-        u.setRole(rs.getString("role"));
         u.setPhoneNumber(rs.getString("phone_number"));
         u.setAppLang(rs.getString("app_lang"));
         u.setAppRowPerPage(rs.getString("app_row_per_page"));
@@ -47,7 +46,6 @@ public class UserRepository {
         u.setId(rs.getLong("id"));
         u.setUsername(rs.getString("username"));
         u.setEmail(rs.getString("email"));
-        u.setRole(rs.getString("role"));
         u.setPhoneNumber(rs.getString("phone_number"));
         u.setAppLang(rs.getString("app_lang"));
         u.setAppRowPerPage(rs.getString("app_row_per_page"));
@@ -135,9 +133,8 @@ public class UserRepository {
     public int insert(UserDto user) {
         String sqlInsert = "INSERT INTO auth.users (" +
                 "username, first_name, last_name, phone_number, email, " +
-                "password, role, app_lang, created_by) " +
-                "VALUES (?, ?, ?, ?, ?," +
-                "?, ?, ?, ?)";
+                "password, app_lang, created_by) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         return jdbcTemplate.update(
                 sqlInsert,
                 user.getUsername(),
@@ -145,9 +142,7 @@ public class UserRepository {
                 user.getLastName(),
                 user.getPhoneNumber(),
                 user.getEmail(),
-
-                user.getPassword(), // sudah bcrypt
-                user.getRole(),
+                user.getPassword(),
                 user.getAppLang(),
                 user.getCreatedBy()
         );
@@ -156,23 +151,23 @@ public class UserRepository {
     public int update(UserDto user) {
         if (user.getPassword() != null) {
             String sql = "update auth.users " +
-                    "set first_name = ?, last_name = ?, email = ?, phone_number = ?, role = ?, " +
+                    "set first_name = ?, last_name = ?, email = ?, phone_number = ?, " +
                     "app_lang = ?, updated_by = ?, updated_at = now(), password = ? " +
                     "where id = ? ";
             return jdbcTemplate.update(
                     sql,
-                    user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(), user.getRole(),
+                    user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(),
                     user.getAppLang(), user.getUpdatedBy(), user.getPassword(),
                     user.getId()
             );
         } else {
             String sql = "update auth.users " +
-                    "set first_name = ?, last_name = ?, email = ?, phone_number = ?, role = ?, " +
+                    "set first_name = ?, last_name = ?, email = ?, phone_number = ?, " +
                     "app_lang = ?, updated_by = ?, updated_at = now() " +
                     "where id = ? ";
             return jdbcTemplate.update(
                     sql,
-                    user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(), user.getRole(),
+                    user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(),
                     user.getAppLang(), user.getUpdatedBy(),
                     user.getId()
             );

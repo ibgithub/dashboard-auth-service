@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtUtil {
@@ -27,17 +28,33 @@ public class JwtUtil {
         );
     }
 
-    public String generateToken(UserDto user) {
+    /**
+     * Generate token dengan multiple roles.
+     * Claim "roles" berisi array, claim "role" berisi role pertama (backward compatible).
+     */
+    public String generateToken(UserDto user, List<String> roles) {
+        String firstRole = roles.isEmpty() ? user.getRole() : roles.get(0);
+
         return Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("userId", user.getId())
-                .claim("role", user.getRole())
+                .claim("role", firstRole)       // backward compatible
+                .claim("roles", roles)           // array of roles
                 .setIssuedAt(new Date())
                 .setExpiration(
                         new Date(System.currentTimeMillis() + expiration)
                 )
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    /**
+     * Generate token dengan single role (backward compatible).
+     * Digunakan kalau user belum punya data di user_roles.
+     */
+    public String generateToken(UserDto user) {
+        String role = user.getRole() != null ? user.getRole() : "";
+        return generateToken(user, List.of(role));
     }
 
     public Claims validateToken(String token) {
@@ -47,5 +64,4 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload();
     }
-
 }

@@ -3,8 +3,11 @@ package com.ib.auth.controller;
 import com.ib.auth.common.ApiResponse;
 import com.ib.auth.common.PageResult;
 import com.ib.auth.dto.ChangePasswordDto;
+import com.ib.auth.dto.MenuDto;
+import com.ib.auth.dto.RoleDto;
 import com.ib.auth.dto.UserDto;
 import com.ib.auth.security.JwtUser;
+import com.ib.auth.service.RoleService;
 import com.ib.auth.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,14 +15,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
+    private final RoleService roleService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @PostMapping
@@ -106,5 +112,39 @@ public class UserController {
             @RequestBody ChangePasswordDto request
     ) {
         userService.changePasswordByAdmin(id, request);
+    }
+
+    // GET /api/users/me/menus - menu yang bisa diakses user yang login (tree structure)
+    @GetMapping("/me/menus")
+    public List<MenuDto> getMyMenus() {
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return roleService.getUserMenus(jwtUser.getUserId());
+    }
+
+    // GET /api/users/me/roles - daftar role user yang login
+    @GetMapping("/me/roles")
+    public List<RoleDto> getMyRoles() {
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return roleService.getUserRoles(jwtUser.getUserId());
+    }
+
+    // PUT /api/users/{id}/roles - set roles untuk user (admin only)
+    @PutMapping("/{id}/roles")
+    public List<RoleDto> setUserRoles(
+            @PathVariable Long id,
+            @RequestBody Map<String, List<Long>> body
+    ) {
+        List<Long> roleIds = body.getOrDefault("roleIds", List.of());
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return roleService.setUserRoles(id, roleIds, jwtUser.getUsername());
     }
 }

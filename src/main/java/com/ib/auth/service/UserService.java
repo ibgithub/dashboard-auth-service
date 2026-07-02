@@ -5,7 +5,6 @@ import com.ib.auth.dto.ChangePasswordDto;
 import com.ib.auth.dto.UserDto;
 import com.ib.auth.repository.UserRepository;
 import com.ib.auth.security.JwtUser;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +22,6 @@ public class UserService {
 
     public void createUser(UserDto request, JwtUser loginUser) {
 
-        // 🔒 ADMIN ONLY
-        if (!"ADMIN".equals(loginUser.getRole())) {
-            throw new AccessDeniedException("Only ADMIN can create user");
-        }
-
         // 🔐 bcrypt password
         request.setPassword(
                 passwordEncoder.encode(request.getPassword())
@@ -41,13 +35,6 @@ public class UserService {
             UserDto request,
             JwtUser loginUser
     ) {
-        Long targetUserId = request.getId();
-
-        if ("USER".equals(loginUser.getRole())
-                && !loginUser.getUserId().equals(targetUserId)) {
-            throw new AccessDeniedException("Forbidden");
-        }
-
         request.setUpdatedBy(loginUser.getUsername());
 
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
@@ -64,10 +51,7 @@ public class UserService {
         return userRepository.findProfileById(loginUser.getUserId());
     }
 
-    public List<UserDto> getUsers(JwtUser loginUser) {
-        if (!"ADMIN".equals(loginUser.getRole())) {
-            throw new AccessDeniedException("Only ADMIN can create user");
-        }
+    public List<UserDto> getUsers() {
         return userRepository.findAll();
     }
 

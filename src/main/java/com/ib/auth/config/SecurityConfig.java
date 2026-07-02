@@ -33,7 +33,7 @@ public class SecurityConfig {
             "/swagger/**"
     };
 
-    @Value("${cors.allowed-origins}")
+    @Value("${cors.allowed-origins:*}")
     private String allowedOrigins;
 
     private final JwtAuthenticationFilter jwtFilter;
@@ -51,16 +51,26 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .requestMatchers("/api/auth/login/**").permitAll()
-                        .requestMatchers("/api/users/me").authenticated()
 
-                        .requestMatchers(HttpMethod.GET,  "/api/users/me").authenticated()
+                        // Endpoint yang bisa diakses semua user yang login
+                        .requestMatchers("/api/users/me").authenticated()
+                        .requestMatchers("/api/users/me/menus").authenticated()
+                        .requestMatchers("/api/users/me/roles").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/users/me/password").authenticated()
 
-                        .requestMatchers(HttpMethod.GET,  "/api/users").hasRole("ADMIN")
+                        // Role & Menu management - hanya ADMIN
+                        .requestMatchers("/api/roles/**").hasRole("ADMIN")
+                        .requestMatchers("/api/permissions/**").hasRole("ADMIN")
+                        .requestMatchers("/api/menus/**").hasRole("ADMIN")
+
+                        // User management - hanya ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/users/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT,  "/api/users/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/users/*/roles").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/users/*/password").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/byRole/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )

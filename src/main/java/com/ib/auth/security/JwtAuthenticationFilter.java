@@ -1,6 +1,5 @@
 package com.ib.auth.security;
 
-
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -32,12 +32,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/api-docs")
                 || path.equals("/swagger")
-                || path.startsWith("/swagger/")
-                ;
-
+                || path.startsWith("/swagger/");
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -56,13 +55,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             Claims claims = jwtUtil.validateToken(token);
             String username = claims.getSubject();
-            String role = claims.get("role", String.class);
             Long userId = claims.get("userId", Long.class);
 
-            List<SimpleGrantedAuthority> authorities =
-                    List.of(new SimpleGrantedAuthority("ROLE_" + role));
+            // Ambil roles dari token
+            List<String> roles;
+            Object rolesObj = claims.get("roles");
+            if (rolesObj instanceof List) {
+                roles = (List<String>) rolesObj;
+            } else {
+                String singleRole = claims.get("role", String.class);
+                roles = singleRole != null ? List.of(singleRole) : List.of();
+            }
 
-            JwtUser jwtUser = new JwtUser(userId, username, role);
+            // Build authorities: ROLE_xxx untuk setiap role
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            for (String role : roles) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+            }
+
+            JwtUser jwtUser = new JwtUser(userId, username, roles);
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
