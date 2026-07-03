@@ -61,12 +61,6 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Users fetched successfully", result));
     }
 
-    @GetMapping("/byRole/{role}")
-    public ResponseEntity<ApiResponse<List<UserDto>>> getUsersByRole(@PathVariable String role) {
-        List<UserDto> users = userService.getUsersByRole(role);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Users fetched successfully", users));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDto>> getById(@PathVariable Long id) {
         UserDto user = userService.getById(id);

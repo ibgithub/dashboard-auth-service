@@ -67,27 +67,19 @@ public class UserRepository {
         );
     }
 
-    public List<UserDto> findByRole(String role) {
-        return jdbcTemplate.query(
-                sql + " where role = ? " + order_by,
-                userWithoutPasswordMapper,
-                role
-        );
-    }
-
     public List<UserDto> findAll(int limit, int offset, String keyword) {
         String sqlSelect = sql;
         if (keyword != null && !keyword.equals("")) {
             keyword = keyword.toUpperCase();
-            sqlSelect += " where ( upper(u.username) like CONCAT('%', ?, '%') or upper(u.first_name) like CONCAT('%', ?, '%') or upper(u.last_name) like CONCAT('%', ?, '%') or upper(u.role) like CONCAT('%', ?, '%') ) " +
+            sqlSelect += " where ( upper(u.username) like CONCAT('%', ?, '%') or upper(u.first_name) like CONCAT('%', ?, '%') or upper(u.last_name) like CONCAT('%', ?, '%') ) " +
                     order_by +
                     " LIMIT ? OFFSET ? ";
             return jdbcTemplate.query(sqlSelect,
                     userWithoutPasswordMapper,
-                    keyword, keyword, keyword, keyword,
+                    keyword, keyword, keyword,
                     limit, offset);
         }
-        sqlSelect += " LIMIT ? OFFSET ? ";
+        sqlSelect += order_by + " LIMIT ? OFFSET ? ";
 
         return jdbcTemplate.query(sqlSelect,
                 userWithoutPasswordMapper,
@@ -100,10 +92,9 @@ public class UserRepository {
             String sqlSelectCount = sqlCount +
                 " where ( upper(u.username) like CONCAT('%', ?, '%') " +
                 "or upper(u.first_name) like CONCAT('%', ?, '%') " +
-                "or upper(u.last_name) like CONCAT('%', ?, '%') " +
-                "or upper(u.role) like CONCAT('%', ?, '%') ) ";
+                "or upper(u.last_name) like CONCAT('%', ?, '%') ) ";
             return jdbcTemplate.queryForObject(sqlSelectCount, Integer.class,
-                keyword, keyword, keyword, keyword);
+                keyword, keyword, keyword);
         }
         return jdbcTemplate.queryForObject(sqlCount, Integer.class);
     }
