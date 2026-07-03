@@ -67,7 +67,9 @@ public class SecurityConfig {
                         // User management - hanya ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/users/*/roles").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/*/roles").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/users/*/password").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/users/byRole/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasRole("ADMIN")

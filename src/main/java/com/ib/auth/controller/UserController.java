@@ -114,6 +114,18 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User roles updated successfully", roles));
     }
 
+    @GetMapping("/{id}/roles")
+    public ResponseEntity<ApiResponse<List<RoleDto>>> getUserRoles(@PathVariable Long id) {
+        List<RoleDto> roles = roleService.getUserRoles(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User roles fetched successfully", roles));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User deleted successfully", null));
+    }
+
     private JwtUser getJwtUser() {
         return (JwtUser) SecurityContextHolder
                 .getContext()

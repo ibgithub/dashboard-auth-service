@@ -98,4 +98,12 @@ public class UserService {
             throw new RuntimeException("Password tidak sama");
         }
     }
+
+    public void deleteUser(Long id) {
+        UserDto user = userRepository.findProfileById(id);
+        if (user == null) {
+            throw new RuntimeException("User tidak ditemukan");
+        }
+        userRepository.deleteById(id);
+    }
 }
