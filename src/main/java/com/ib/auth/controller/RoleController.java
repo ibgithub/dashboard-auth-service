@@ -32,6 +32,12 @@ public class RoleController {
         return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Roles fetched successfully", result));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<RoleDto>>> getAllRolesNoPaging() {
+        List<RoleDto> roles = roleService.getAllRoles();
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Roles fetched successfully", roles));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<RoleDto>> getRoleById(@PathVariable Long id) {
         RoleDto role = roleService.getRoleById(id);
