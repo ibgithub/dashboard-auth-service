@@ -142,6 +142,13 @@ public class RoleService {
         return menuRepository.findAll();
     }
 
+    public PageResult<MenuDto> findMenusPaged(int page, int size, String keyword) {
+        int offset = page * size;
+        List<MenuDto> menus = menuRepository.findAll(size, offset, keyword);
+        int total = menuRepository.countAll(keyword);
+        return new PageResult<>(menus, page, size, total);
+    }
+
     // ==================== Helper: Build Tree ====================
 
     private List<MenuDto> buildMenuTree(List<MenuDto> flatMenus) {

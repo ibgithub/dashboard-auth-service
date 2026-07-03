@@ -28,13 +28,46 @@ public class MenuRepository {
         return m;
     };
 
-    // Semua menu (untuk admin manage)
+    // Semua menu tanpa paging (untuk checklist di role management)
     public List<MenuDto> findAll() {
         return jdbcTemplate.query(
                 "SELECT id, code, parent_code, menu_key, path, icon, sort_order " +
                         "FROM auth.menu ORDER BY sort_order, code",
                 menuMapper
         );
+    }
+
+    // Menu dengan paging + keyword search (untuk halaman menu management)
+    public List<MenuDto> findAll(int limit, int offset, String keyword) {
+        if (keyword != null && !keyword.isEmpty()) {
+            keyword = keyword.toUpperCase();
+            String sql = "SELECT id, code, parent_code, menu_key, path, icon, sort_order " +
+                    "FROM auth.menu " +
+                    "WHERE upper(code) LIKE CONCAT('%', ?, '%') " +
+                    "OR upper(menu_key) LIKE CONCAT('%', ?, '%') " +
+                    "OR upper(path) LIKE CONCAT('%', ?, '%') " +
+                    "ORDER BY sort_order, code LIMIT ? OFFSET ?";
+            return jdbcTemplate.query(sql, menuMapper, keyword, keyword, keyword, limit, offset);
+        }
+        return jdbcTemplate.query(
+                "SELECT id, code, parent_code, menu_key, path, icon, sort_order " +
+                        "FROM auth.menu ORDER BY sort_order, code LIMIT ? OFFSET ?",
+                menuMapper, limit, offset
+        );
+    }
+
+    public int countAll(String keyword) {
+        if (keyword != null && !keyword.isEmpty()) {
+            keyword = keyword.toUpperCase();
+            String sql = "SELECT count(1) FROM auth.menu " +
+                    "WHERE upper(code) LIKE CONCAT('%', ?, '%') " +
+                    "OR upper(menu_key) LIKE CONCAT('%', ?, '%') " +
+                    "OR upper(path) LIKE CONCAT('%', ?, '%')";
+            Integer count = jdbcTemplate.queryForObject(sql, Integer.class, keyword, keyword, keyword);
+            return count != null ? count : 0;
+        }
+        Integer count = jdbcTemplate.queryForObject("SELECT count(1) FROM auth.menu", Integer.class);
+        return count != null ? count : 0;
     }
 
     // Menu yang dimiliki role tertentu
