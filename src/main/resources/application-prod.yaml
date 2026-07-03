@@ -22,3 +22,10 @@ springdoc:
 
 cors:
   allowed-origins: http://dashboard.teman-umkm.com,http://localhost:3000
+
+logging:
+  file:
+    name: /home/ibaihaqi/apps/anvaia/backend/logs/auth-service.log
+  level:
+    com.ib.auth: INFO
+    org.springframework.web: WARN
