@@ -33,7 +33,7 @@ public class JwtUtil {
      * Claim "roles" berisi array, claim "role" berisi role pertama (backward compatible).
      */
     public String generateToken(UserDto user, List<String> roles) {
-        String firstRole = roles.isEmpty() ? user.getRole() : roles.get(0);
+        String firstRole = roles.isEmpty() ? "" : roles.get(0);
 
         return Jwts.builder()
                 .setSubject(user.getUsername())
@@ -49,12 +49,11 @@ public class JwtUtil {
     }
 
     /**
+    /**
      * Generate token dengan single role (backward compatible).
-     * Digunakan kalau user belum punya data di user_roles.
      */
     public String generateToken(UserDto user) {
-        String role = user.getRole() != null ? user.getRole() : "";
-        return generateToken(user, List.of(role));
+        return generateToken(user, List.of());
     }
 
     public Claims validateToken(String token) {

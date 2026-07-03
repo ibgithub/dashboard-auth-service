@@ -1,11 +1,12 @@
 package com.ib.auth.dto;
 
+import java.util.List;
+
 public class UserDto {
     private Long id;
     private String username;
     private String email;
     private String password;
-    private String role;
     private String firstName;
     private String lastName;
     private String fullName;
@@ -15,6 +16,7 @@ public class UserDto {
     private String appColPerPage;
     private String createdBy;
     private String updatedBy;
+    private List<RoleDto> roles;
 
     public Long getId() {
         return id;
@@ -48,12 +50,12 @@ public class UserDto {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
+    public List<RoleDto> getRoles() {
+        return roles;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRoles(List<RoleDto> roles) {
+        this.roles = roles;
     }
 
     public String getFirstName() {

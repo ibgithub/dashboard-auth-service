@@ -2,7 +2,9 @@ package com.ib.auth.service;
 
 import com.ib.auth.common.PageResult;
 import com.ib.auth.dto.ChangePasswordDto;
+import com.ib.auth.dto.RoleDto;
 import com.ib.auth.dto.UserDto;
+import com.ib.auth.repository.RoleRepository;
 import com.ib.auth.repository.UserRepository;
 import com.ib.auth.security.JwtUser;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,10 +15,12 @@ import java.util.List;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
@@ -48,7 +52,11 @@ public class UserService {
         userRepository.update(request);
     }
     public UserDto getMyProfile(JwtUser loginUser) {
-        return userRepository.findProfileById(loginUser.getUserId());
+        UserDto user = userRepository.findProfileById(loginUser.getUserId());
+        if (user != null) {
+            user.setRoles(roleRepository.findRolesByUserId(user.getId()));
+        }
+        return user;
     }
 
     public List<UserDto> getUsers() {
@@ -62,11 +70,21 @@ public class UserService {
         List<UserDto> users = userRepository.findAll(size, offset, keyword);
         int total = userRepository.countAll(keyword);
 
+        // Populate roles untuk setiap user
+        for (UserDto user : users) {
+            List<RoleDto> roles = roleRepository.findRolesByUserId(user.getId());
+            user.setRoles(roles);
+        }
+
         return new PageResult<>(users, page, size, total);
     }
 
     public UserDto getById(Long id) {
-        return userRepository.findProfileById(id);
+        UserDto user = userRepository.findProfileById(id);
+        if (user != null) {
+            user.setRoles(roleRepository.findRolesByUserId(user.getId()));
+        }
+        return user;
     }
     public void changePasswordSelf(Long userId, ChangePasswordDto dto) {
 
