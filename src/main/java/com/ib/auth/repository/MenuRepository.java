@@ -38,6 +38,9 @@ public class MenuRepository {
     }
 
     // Menu dengan paging + keyword search (untuk halaman menu management)
+    // Sort: parent dulu, diikuti children-nya (M1, M1.1, M1.2, ..., M2, M2.1, ...)
+    private static final String MENU_ORDER = "ORDER BY COALESCE(parent_code, code), CASE WHEN parent_code IS NULL THEN 0 ELSE 1 END, sort_order";
+
     public List<MenuDto> findAll(int limit, int offset, String keyword) {
         if (keyword != null && !keyword.isEmpty()) {
             keyword = keyword.toUpperCase();
@@ -46,12 +49,12 @@ public class MenuRepository {
                     "WHERE upper(code) LIKE CONCAT('%', ?, '%') " +
                     "OR upper(menu_key) LIKE CONCAT('%', ?, '%') " +
                     "OR upper(path) LIKE CONCAT('%', ?, '%') " +
-                    "ORDER BY menu_key LIMIT ? OFFSET ?";
+                    MENU_ORDER + " LIMIT ? OFFSET ?";
             return jdbcTemplate.query(sql, menuMapper, keyword, keyword, keyword, limit, offset);
         }
         return jdbcTemplate.query(
-                "SELECT id, code, parent_code, menu_key, path, icon, sort_order " +
-                        "FROM auth.menu ORDER BY menu_key LIMIT ? OFFSET ?",
+                "SELECT id, code, parent_code, menu_key, path, icon, sort_order FROM auth.menu " +
+                        MENU_ORDER + " LIMIT ? OFFSET ?",
                 menuMapper, limit, offset
         );
     }
