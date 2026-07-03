@@ -17,6 +17,7 @@ public class UserDto {
     private String createdBy;
     private String updatedBy;
     private List<RoleDto> roles;
+    private List<Long> roleIds;
 
     public Long getId() {
         return id;
@@ -128,5 +129,13 @@ public class UserDto {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    public List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public void setRoleIds(List<Long> roleIds) {
+        this.roleIds = roleIds;
     }
 }

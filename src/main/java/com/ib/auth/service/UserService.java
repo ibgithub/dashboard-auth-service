@@ -50,6 +50,14 @@ public class UserService {
         }
 
         userRepository.update(request);
+
+        // Update roles kalau roleIds dikirim
+        if (request.getRoleIds() != null) {
+            roleRepository.deleteUserRoles(request.getId());
+            for (Long roleId : request.getRoleIds()) {
+                roleRepository.insertUserRole(request.getId(), roleId, loginUser.getUsername());
+            }
+        }
     }
     public UserDto getMyProfile(JwtUser loginUser) {
         UserDto user = userRepository.findProfileById(loginUser.getUserId());
