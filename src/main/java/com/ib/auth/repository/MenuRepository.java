@@ -46,12 +46,12 @@ public class MenuRepository {
                     "WHERE upper(code) LIKE CONCAT('%', ?, '%') " +
                     "OR upper(menu_key) LIKE CONCAT('%', ?, '%') " +
                     "OR upper(path) LIKE CONCAT('%', ?, '%') " +
-                    "ORDER BY code LIMIT ? OFFSET ?";
+                    "ORDER BY menu_key LIMIT ? OFFSET ?";
             return jdbcTemplate.query(sql, menuMapper, keyword, keyword, keyword, limit, offset);
         }
         return jdbcTemplate.query(
                 "SELECT id, code, parent_code, menu_key, path, icon, sort_order " +
-                        "FROM auth.menu ORDER BY code LIMIT ? OFFSET ?",
+                        "FROM auth.menu ORDER BY menu_key LIMIT ? OFFSET ?",
                 menuMapper, limit, offset
         );
     }
