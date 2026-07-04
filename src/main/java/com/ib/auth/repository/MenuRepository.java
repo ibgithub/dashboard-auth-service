@@ -118,4 +118,39 @@ public class MenuRepository {
         );
         return list.isEmpty() ? null : list.get(0);
     }
+
+    public MenuDto findByCode(String code) {
+        List<MenuDto> list = jdbcTemplate.query(
+                "SELECT id, code, parent_code, menu_key, path, icon, sort_order " +
+                        "FROM auth.menu WHERE code = ?",
+                menuMapper, code
+        );
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    public int insert(MenuDto menu) {
+        return jdbcTemplate.update(
+                "INSERT INTO auth.menu (code, parent_code, menu_key, path, icon, sort_order) VALUES (?, ?, ?, ?, ?, ?)",
+                menu.getCode(), menu.getParentCode(), menu.getMenuKey(), menu.getPath(), menu.getIcon(), menu.getSortOrder()
+        );
+    }
+
+    public int update(MenuDto menu) {
+        return jdbcTemplate.update(
+                "UPDATE auth.menu SET code = ?, parent_code = ?, menu_key = ?, path = ?, icon = ?, sort_order = ? WHERE id = ?",
+                menu.getCode(), menu.getParentCode(), menu.getMenuKey(), menu.getPath(), menu.getIcon(), menu.getSortOrder(), menu.getId()
+        );
+    }
+
+    public int deleteById(Long id) {
+        return jdbcTemplate.update("DELETE FROM auth.menu WHERE id = ?", id);
+    }
+
+    public int countByParentCode(String parentCode) {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT count(1) FROM auth.menu WHERE parent_code = ?",
+                Integer.class, parentCode
+        );
+        return count != null ? count : 0;
+    }
 }

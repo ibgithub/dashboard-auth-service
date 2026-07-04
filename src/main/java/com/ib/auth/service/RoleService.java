@@ -149,6 +149,48 @@ public class RoleService {
         return new PageResult<>(menus, page, size, total);
     }
 
+    public MenuDto createMenu(MenuDto request) {
+        if (menuRepository.findByCode(request.getCode()) != null) {
+            throw new RuntimeException("Menu code sudah ada");
+        }
+        menuRepository.insert(request);
+        return menuRepository.findByCode(request.getCode());
+    }
+
+    public MenuDto updateMenu(Long id, MenuDto request) {
+        MenuDto existing = menuRepository.findById(id);
+        if (existing == null) {
+            throw new RuntimeException("Menu tidak ditemukan");
+        }
+        MenuDto duplicate = menuRepository.findByCode(request.getCode());
+        if (duplicate != null && !duplicate.getId().equals(id)) {
+            throw new RuntimeException("Menu code sudah ada");
+        }
+        request.setId(id);
+        menuRepository.update(request);
+        return menuRepository.findById(id);
+    }
+
+    public void deleteMenu(Long id) {
+        MenuDto existing = menuRepository.findById(id);
+        if (existing == null) {
+            throw new RuntimeException("Menu tidak ditemukan");
+        }
+        // Kalau parent menu, cek apakah masih punya children
+        if (existing.getParentCode() == null && menuRepository.countByParentCode(existing.getCode()) > 0) {
+            throw new RuntimeException("Menu masih memiliki sub-menu");
+        }
+        menuRepository.deleteById(id);
+    }
+
+    public MenuDto getMenuById(Long id) {
+        MenuDto menu = menuRepository.findById(id);
+        if (menu == null) {
+            throw new RuntimeException("Menu tidak ditemukan");
+        }
+        return menu;
+    }
+
     // ==================== Helper: Build Tree ====================
 
     private List<MenuDto> buildMenuTree(List<MenuDto> flatMenus) {

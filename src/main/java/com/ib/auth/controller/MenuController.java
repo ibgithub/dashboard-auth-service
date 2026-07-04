@@ -35,4 +35,32 @@ public class MenuController {
         List<MenuDto> menus = roleService.getAllMenus();
         return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Menus fetched successfully", menus));
     }
+
+    // GET /api/menus/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<MenuDto>> getMenuById(@PathVariable Long id) {
+        MenuDto menu = roleService.getMenuById(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Menu fetched successfully", menu));
+    }
+
+    // POST /api/menus
+    @PostMapping
+    public ResponseEntity<ApiResponse<MenuDto>> createMenu(@RequestBody MenuDto request) {
+        MenuDto menu = roleService.createMenu(request);
+        return ResponseEntity.ok(new ApiResponse<>(true, "CREATED", "Menu created successfully", menu));
+    }
+
+    // PUT /api/menus/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<MenuDto>> updateMenu(@PathVariable Long id, @RequestBody MenuDto request) {
+        MenuDto menu = roleService.updateMenu(id, request);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Menu updated successfully", menu));
+    }
+
+    // DELETE /api/menus/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteMenu(@PathVariable Long id) {
+        roleService.deleteMenu(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Menu deleted successfully", null));
+    }
 }
