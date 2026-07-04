@@ -33,6 +33,12 @@ public class RoleService {
         int offset = page * size;
         List<RoleDto> roles = roleRepository.findAll(size, offset, keyword);
         int total = roleRepository.countAll(keyword);
+
+        // Populate menus untuk setiap role
+        for (RoleDto role : roles) {
+            role.setMenus(menuRepository.findByRoleId(role.getId()));
+        }
+
         return new PageResult<>(roles, page, size, total);
     }
 
@@ -41,6 +47,7 @@ public class RoleService {
         if (role == null) {
             throw new RuntimeException("Role tidak ditemukan");
         }
+        role.setMenus(menuRepository.findByRoleId(id));
         return role;
     }
 
@@ -49,7 +56,16 @@ public class RoleService {
             throw new RuntimeException("Role sudah ada");
         }
         roleRepository.insert(request, createdBy);
-        return roleRepository.findByRoleName(request.getRoleName());
+        RoleDto created = roleRepository.findByRoleName(request.getRoleName());
+
+        // Simpan menus kalau menuIds dikirim
+        if (request.getMenuIds() != null && !request.getMenuIds().isEmpty()) {
+            for (Long menuId : request.getMenuIds()) {
+                menuRepository.insertRoleMenu(created.getId(), menuId, createdBy);
+            }
+        }
+        created.setMenus(menuRepository.findByRoleId(created.getId()));
+        return created;
     }
 
     public RoleDto updateRole(Long id, RoleDto request, String updatedBy) {
@@ -63,7 +79,18 @@ public class RoleService {
         }
         request.setId(id);
         roleRepository.update(request, updatedBy);
-        return roleRepository.findById(id);
+
+        // Update menus kalau menuIds dikirim
+        if (request.getMenuIds() != null) {
+            menuRepository.deleteRoleMenus(id);
+            for (Long menuId : request.getMenuIds()) {
+                menuRepository.insertRoleMenu(id, menuId, updatedBy);
+            }
+        }
+
+        RoleDto updated = roleRepository.findById(id);
+        updated.setMenus(menuRepository.findByRoleId(id));
+        return updated;
     }
 
     public void deleteRole(Long id) {

@@ -1,9 +1,13 @@
 package com.ib.auth.dto;
 
+import java.util.List;
+
 public class RoleDto {
     private Long id;
     private String roleName;
     private String description;
+    private List<MenuDto> menus;
+    private List<Long> menuIds;
 
     public Long getId() {
         return id;
@@ -27,5 +31,21 @@ public class RoleDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<MenuDto> getMenus() {
+        return menus;
+    }
+
+    public void setMenus(List<MenuDto> menus) {
+        this.menus = menus;
+    }
+
+    public List<Long> getMenuIds() {
+        return menuIds;
+    }
+
+    public void setMenuIds(List<Long> menuIds) {
+        this.menuIds = menuIds;
     }
 }
