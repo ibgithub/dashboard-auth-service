@@ -34,12 +34,14 @@ public class JwtUtil {
      */
     public String generateToken(UserDto user, List<String> roles) {
         String firstRole = roles.isEmpty() ? "" : roles.get(0);
+        String lang = user.getAppLang() != null ? user.getAppLang() : "ID";
 
         return Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("userId", user.getId())
                 .claim("role", firstRole)       // backward compatible
                 .claim("roles", roles)           // array of roles
+                .claim("appLang", lang)          // bahasa user
                 .setIssuedAt(new Date())
                 .setExpiration(
                         new Date(System.currentTimeMillis() + expiration)

@@ -33,6 +33,11 @@ public class UserService {
 
         request.setCreatedBy(loginUser.getUsername());
 
+        // Default bahasa Indonesia kalau tidak diisi
+        if (request.getAppLang() == null || request.getAppLang().isBlank()) {
+            request.setAppLang("ID");
+        }
+
         userRepository.insert(request);
     }
     public void updateUser(
