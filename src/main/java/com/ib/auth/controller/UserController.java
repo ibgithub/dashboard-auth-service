@@ -34,6 +34,24 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(true, "CREATED", "User created successfully", null));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserDto>> getMyProfile() {
+        JwtUser jwtUser = getJwtUser();
+        UserDto user = userService.getMyProfile(jwtUser);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Profile fetched successfully", user));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<ApiResponse<UserDto>> updateMyProfile(@RequestBody UserDto request) {
+        JwtUser jwtUser = getJwtUser();
+        request.setId(jwtUser.getUserId());
+        request.setUpdatedBy(jwtUser.getUsername());
+        request.setPassword(null); // password ganti lewat /me/password
+        userService.updateMyProfile(request);
+        UserDto updated = userService.getMyProfile(jwtUser);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Profile updated successfully", updated));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> updateUser(
             @PathVariable Long id,
@@ -43,13 +61,6 @@ public class UserController {
         request.setId(id);
         userService.updateUser(request, jwtUser);
         return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User updated successfully", null));
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserDto>> getMyProfile() {
-        JwtUser jwtUser = getJwtUser();
-        UserDto user = userService.getMyProfile(jwtUser);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Profile fetched successfully", user));
     }
 
     @GetMapping

@@ -72,6 +72,11 @@ public class UserService {
         return user;
     }
 
+    public void updateMyProfile(UserDto request) {
+        request.setPassword(null);
+        userRepository.update(request);
+    }
+
     public List<UserDto> getUsers() {
         return userRepository.findAll();
     }
