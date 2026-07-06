@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleAuthenticationException(
+    public ResponseEntity<ApiResponse<Object>> handleAuthenticationException(
             AuthenticationException ex) {
-        ApiResponse<Void> response = new ApiResponse<>(
-            false, "UNAUTHORIZED", ex.getMessage(), null
+        ApiResponse<Object> response = new ApiResponse<>(
+            false, "UNAUTHORIZED", ex.getMessage(), ex.getData()
         );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }

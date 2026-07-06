@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AuthService {
@@ -62,7 +63,11 @@ public class AuthService {
                 throw new AuthenticationException("auth.account.blocked_max_attempts");
             }
 
-            throw new AuthenticationException("auth.login.invalid_credentials");
+            int remaining = maxWrongPassword - currentFailed;
+            throw new AuthenticationException(
+                    "auth.login.invalid_credentials",
+                    Map.of("remainingAttempts", remaining)
+            );
         }
 
         // Login sukses — reset failed count
