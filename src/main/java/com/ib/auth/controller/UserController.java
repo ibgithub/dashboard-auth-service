@@ -131,6 +131,18 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User deleted successfully", null));
     }
 
+    @PutMapping("/{id}/unlock")
+    public ResponseEntity<ApiResponse<Void>> unlockUser(@PathVariable Long id) {
+        userService.unlockUser(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User unlocked successfully", null));
+    }
+
+    @PutMapping("/{id}/block")
+    public ResponseEntity<ApiResponse<Void>> blockUser(@PathVariable Long id) {
+        userService.blockUser(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User blocked successfully", null));
+    }
+
     private JwtUser getJwtUser() {
         return (JwtUser) SecurityContextHolder
                 .getContext()

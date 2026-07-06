@@ -18,6 +18,8 @@ public class UserDto {
     private String updatedBy;
     private List<RoleDto> roles;
     private List<Long> roleIds;
+    private Integer status;
+    private Integer loginFailedCount;
 
     public Long getId() {
         return id;
@@ -137,5 +139,21 @@ public class UserDto {
 
     public void setRoleIds(List<Long> roleIds) {
         this.roleIds = roleIds;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getLoginFailedCount() {
+        return loginFailedCount;
+    }
+
+    public void setLoginFailedCount(Integer loginFailedCount) {
+        this.loginFailedCount = loginFailedCount;
     }
 }

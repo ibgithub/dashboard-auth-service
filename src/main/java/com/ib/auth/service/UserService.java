@@ -139,4 +139,21 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
+
+    public void unlockUser(Long id) {
+        UserDto user = userRepository.findProfileById(id);
+        if (user == null) {
+            throw new RuntimeException("User tidak ditemukan");
+        }
+        userRepository.updateStatus(id, 1); // ACTIVE
+        userRepository.resetLoginFailedCount(id);
+    }
+
+    public void blockUser(Long id) {
+        UserDto user = userRepository.findProfileById(id);
+        if (user == null) {
+            throw new RuntimeException("User tidak ditemukan");
+        }
+        userRepository.updateStatus(id, 2); // BLOCKED
+    }
 }

@@ -11,7 +11,8 @@ import java.util.List;
 public class UserRepository {
     private final JdbcTemplate jdbcTemplate;
     String sql = "select u.id, u.username, u.password, u.email, " +
-            "u.first_name, u.last_name, u.phone_number, u.app_lang, u.app_row_per_page " +
+            "u.first_name, u.last_name, u.phone_number, u.app_lang, u.app_row_per_page, " +
+            "u.status, u.login_failed_count " +
             "from auth.users u ";
     String sqlCount = "select count(1) " +
             "from auth.users u ";
@@ -30,6 +31,8 @@ public class UserRepository {
         u.setPhoneNumber(rs.getString("phone_number"));
         u.setAppLang(rs.getString("app_lang"));
         u.setAppRowPerPage(rs.getString("app_row_per_page"));
+        u.setStatus(rs.getInt("status"));
+        u.setLoginFailedCount(rs.getInt("login_failed_count"));
         String firstName = rs.getString("first_name");
         String lastName = rs.getString("last_name");
         firstName = (firstName == null ? "" : firstName);
@@ -49,6 +52,8 @@ public class UserRepository {
         u.setPhoneNumber(rs.getString("phone_number"));
         u.setAppLang(rs.getString("app_lang"));
         u.setAppRowPerPage(rs.getString("app_row_per_page"));
+        u.setStatus(rs.getInt("status"));
+        u.setLoginFailedCount(rs.getInt("login_failed_count"));
         String firstName = rs.getString("first_name");
         String lastName = rs.getString("last_name");
         firstName = (firstName == null ? "" : firstName);
@@ -169,6 +174,27 @@ public class UserRepository {
         return jdbcTemplate.update(
                 "DELETE FROM auth.users WHERE id = ?",
                 id
+        );
+    }
+
+    public void incrementLoginFailedCount(Long userId) {
+        jdbcTemplate.update(
+                "UPDATE auth.users SET login_failed_count = login_failed_count + 1 WHERE id = ?",
+                userId
+        );
+    }
+
+    public void resetLoginFailedCount(Long userId) {
+        jdbcTemplate.update(
+                "UPDATE auth.users SET login_failed_count = 0 WHERE id = ?",
+                userId
+        );
+    }
+
+    public void updateStatus(Long userId, int status) {
+        jdbcTemplate.update(
+                "UPDATE auth.users SET status = ?, updated_at = now() WHERE id = ?",
+                status, userId
         );
     }
 }
