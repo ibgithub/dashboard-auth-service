@@ -22,7 +22,7 @@ public class SettingParameterService {
     public SettingParameterDto getById(Long id) {
         SettingParameterDto param = repository.findById(id);
         if (param == null) {
-            throw new RuntimeException("Parameter tidak ditemukan");
+            throw new RuntimeException("setting.not_found");
         }
         return param;
     }
@@ -30,14 +30,14 @@ public class SettingParameterService {
     public SettingParameterDto getByName(String name) {
         SettingParameterDto param = repository.findByName(name);
         if (param == null) {
-            throw new RuntimeException("Parameter tidak ditemukan: " + name);
+            throw new RuntimeException("setting.not_found");
         }
         return param;
     }
 
     public SettingParameterDto create(SettingParameterDto request, String createdBy) {
         if (repository.findByName(request.getName()) != null) {
-            throw new RuntimeException("Parameter sudah ada: " + request.getName());
+            throw new RuntimeException("setting.already_exists");
         }
         repository.insert(request, createdBy);
         return repository.findByName(request.getName());
@@ -46,11 +46,11 @@ public class SettingParameterService {
     public SettingParameterDto update(Long id, SettingParameterDto request, String updatedBy) {
         SettingParameterDto existing = repository.findById(id);
         if (existing == null) {
-            throw new RuntimeException("Parameter tidak ditemukan");
+            throw new RuntimeException("setting.not_found");
         }
         SettingParameterDto duplicate = repository.findByName(request.getName());
         if (duplicate != null && !duplicate.getId().equals(id)) {
-            throw new RuntimeException("Parameter sudah ada: " + request.getName());
+            throw new RuntimeException("setting.already_exists");
         }
         request.setId(id);
         repository.update(request, updatedBy);
@@ -60,7 +60,7 @@ public class SettingParameterService {
     public void delete(Long id) {
         SettingParameterDto existing = repository.findById(id);
         if (existing == null) {
-            throw new RuntimeException("Parameter tidak ditemukan");
+            throw new RuntimeException("setting.not_found");
         }
         repository.deleteById(id);
     }

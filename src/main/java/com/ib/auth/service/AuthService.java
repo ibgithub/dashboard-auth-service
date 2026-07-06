@@ -39,12 +39,12 @@ public class AuthService {
         UserDto user = userRepository.findByUsername(username);
 
         if (user == null) {
-            throw new AuthenticationException("Username atau password salah");
+            throw new AuthenticationException("auth.login.invalid_credentials");
         }
 
         // Cek apakah akun di-block (status = 2)
         if (user.getStatus() != null && user.getStatus() == 2) {
-            throw new AuthenticationException("Akun Anda diblokir. Hubungi administrator.");
+            throw new AuthenticationException("auth.account.blocked");
         }
 
         // Cek password
@@ -59,10 +59,10 @@ public class AuthService {
             if (currentFailed >= maxWrongPassword) {
                 // Block akun
                 userRepository.updateStatus(user.getId(), 2);
-                throw new AuthenticationException("Akun Anda diblokir karena terlalu banyak percobaan login gagal. Hubungi administrator.");
+                throw new AuthenticationException("auth.account.blocked_max_attempts");
             }
 
-            throw new AuthenticationException("Username atau password salah. Sisa percobaan: " + (maxWrongPassword - currentFailed));
+            throw new AuthenticationException("auth.login.invalid_credentials");
         }
 
         // Login sukses — reset failed count

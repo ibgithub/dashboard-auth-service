@@ -29,45 +29,45 @@ public class RoleController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
         PageResult<RoleDto> result = roleService.findPaged(page, size, keyword);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Roles fetched successfully", result));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "role.list.fetched", result));
     }
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<RoleDto>>> getAllRolesNoPaging() {
         List<RoleDto> roles = roleService.getAllRoles();
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Roles fetched successfully", roles));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "role.list.fetched", roles));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<RoleDto>> getRoleById(@PathVariable Long id) {
         RoleDto role = roleService.getRoleById(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Role fetched successfully", role));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "role.fetched", role));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<RoleDto>> createRole(@RequestBody RoleDto request) {
         String username = getCurrentUsername();
         RoleDto role = roleService.createRole(request, username);
-        return ResponseEntity.ok(new ApiResponse<>(true, "CREATED", "Role created successfully", role));
+        return ResponseEntity.ok(new ApiResponse<>(true, "CREATED", "role.created", role));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<RoleDto>> updateRole(@PathVariable Long id, @RequestBody RoleDto request) {
         String username = getCurrentUsername();
         RoleDto role = roleService.updateRole(id, request, username);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Role updated successfully", role));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "role.updated", role));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteRole(@PathVariable Long id) {
         roleService.deleteRole(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Role deleted successfully", null));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "role.deleted", null));
     }
 
     @GetMapping("/{id}/menus")
     public ResponseEntity<ApiResponse<List<MenuDto>>> getRoleMenus(@PathVariable Long id) {
         List<MenuDto> menus = roleService.getRoleMenus(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Role menus fetched successfully", menus));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "role.menus.fetched", menus));
     }
 
     @PutMapping("/{id}/menus")
@@ -78,7 +78,7 @@ public class RoleController {
         List<Long> menuIds = body.getOrDefault("menuIds", List.of());
         String username = getCurrentUsername();
         List<MenuDto> menus = roleService.setRoleMenus(id, menuIds, username);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Role menus updated successfully", menus));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "role.menus.updated", menus));
     }
 
     private String getCurrentUsername() {

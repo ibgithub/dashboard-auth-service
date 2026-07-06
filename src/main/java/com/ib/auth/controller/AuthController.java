@@ -27,7 +27,7 @@ public class AuthController {
                 request.getPassword()
         );
         JwtResponse jwt = new JwtResponse(token);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Login successful", jwt));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "auth.login.success", jwt));
     }
 
     @GetMapping("/me")
@@ -36,6 +36,6 @@ public class AuthController {
                 "username", authentication.getName(),
                 "authorities", authentication.getAuthorities()
         );
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User info fetched", data));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "auth.me.success", data));
     }
 }

@@ -31,14 +31,14 @@ public class UserController {
     public ResponseEntity<ApiResponse<Void>> createUser(@RequestBody UserDto request) {
         JwtUser jwtUser = getJwtUser();
         userService.createUser(request, jwtUser);
-        return ResponseEntity.ok(new ApiResponse<>(true, "CREATED", "User created successfully", null));
+        return ResponseEntity.ok(new ApiResponse<>(true, "CREATED", "user.created", null));
     }
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserDto>> getMyProfile() {
         JwtUser jwtUser = getJwtUser();
         UserDto user = userService.getMyProfile(jwtUser);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Profile fetched successfully", user));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.profile.fetched", user));
     }
 
     @PutMapping("/me")
@@ -49,7 +49,7 @@ public class UserController {
         request.setPassword(null); // password ganti lewat /me/password
         userService.updateMyProfile(request);
         UserDto updated = userService.getMyProfile(jwtUser);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Profile updated successfully", updated));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.profile.updated", updated));
     }
 
     @PutMapping("/{id}")
@@ -60,7 +60,7 @@ public class UserController {
         JwtUser jwtUser = getJwtUser();
         request.setId(id);
         userService.updateUser(request, jwtUser);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User updated successfully", null));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.updated", null));
     }
 
     @GetMapping
@@ -69,20 +69,20 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
         PageResult<UserDto> result = userService.findPaged(page, size, keyword);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Users fetched successfully", result));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.list.fetched", result));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDto>> getById(@PathVariable Long id) {
         UserDto user = userService.getById(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User fetched successfully", user));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.fetched", user));
     }
 
     @PutMapping("/me/password")
     public ResponseEntity<ApiResponse<Void>> changePasswordSelf(@RequestBody ChangePasswordDto request) {
         JwtUser jwtUser = getJwtUser();
         userService.changePasswordSelf(jwtUser.getUserId(), request);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Password changed successfully", null));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.password.changed", null));
     }
 
     @PutMapping("/{id}/password")
@@ -91,21 +91,21 @@ public class UserController {
             @RequestBody ChangePasswordDto request
     ) {
         userService.changePasswordByAdmin(id, request);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Password changed successfully", null));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.password.changed", null));
     }
 
     @GetMapping("/me/menus")
     public ResponseEntity<ApiResponse<List<MenuDto>>> getMyMenus() {
         JwtUser jwtUser = getJwtUser();
         List<MenuDto> menus = roleService.getUserMenus(jwtUser.getUserId());
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Menus fetched successfully", menus));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.menus.fetched", menus));
     }
 
     @GetMapping("/me/roles")
     public ResponseEntity<ApiResponse<List<RoleDto>>> getMyRoles() {
         JwtUser jwtUser = getJwtUser();
         List<RoleDto> roles = roleService.getUserRoles(jwtUser.getUserId());
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Roles fetched successfully", roles));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.roles.fetched", roles));
     }
 
     @PutMapping("/{id}/roles")
@@ -116,31 +116,31 @@ public class UserController {
         List<Long> roleIds = body.getOrDefault("roleIds", List.of());
         JwtUser jwtUser = getJwtUser();
         List<RoleDto> roles = roleService.setUserRoles(id, roleIds, jwtUser.getUsername());
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User roles updated successfully", roles));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.roles.updated", roles));
     }
 
     @GetMapping("/{id}/roles")
     public ResponseEntity<ApiResponse<List<RoleDto>>> getUserRoles(@PathVariable Long id) {
         List<RoleDto> roles = roleService.getUserRoles(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User roles fetched successfully", roles));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.roles.fetched", roles));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User deleted successfully", null));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.deleted", null));
     }
 
     @PutMapping("/{id}/unlock")
     public ResponseEntity<ApiResponse<Void>> unlockUser(@PathVariable Long id) {
         userService.unlockUser(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User unlocked successfully", null));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.unlocked", null));
     }
 
     @PutMapping("/{id}/block")
     public ResponseEntity<ApiResponse<Void>> blockUser(@PathVariable Long id) {
         userService.blockUser(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "User blocked successfully", null));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "user.blocked", null));
     }
 
     private JwtUser getJwtUser() {

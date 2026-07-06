@@ -45,7 +45,7 @@ public class RoleService {
     public RoleDto getRoleById(Long id) {
         RoleDto role = roleRepository.findById(id);
         if (role == null) {
-            throw new RuntimeException("Role tidak ditemukan");
+            throw new RuntimeException("role.not_found");
         }
         role.setMenus(menuRepository.findByRoleId(id));
         return role;
@@ -53,7 +53,7 @@ public class RoleService {
 
     public RoleDto createRole(RoleDto request, String createdBy) {
         if (roleRepository.findByRoleName(request.getRoleName()) != null) {
-            throw new RuntimeException("Role sudah ada");
+            throw new RuntimeException("role.already_exists");
         }
         roleRepository.insert(request, createdBy);
         RoleDto created = roleRepository.findByRoleName(request.getRoleName());
@@ -71,11 +71,11 @@ public class RoleService {
     public RoleDto updateRole(Long id, RoleDto request, String updatedBy) {
         RoleDto existing = roleRepository.findById(id);
         if (existing == null) {
-            throw new RuntimeException("Role tidak ditemukan");
+            throw new RuntimeException("role.not_found");
         }
         RoleDto duplicate = roleRepository.findByRoleName(request.getRoleName());
         if (duplicate != null && !duplicate.getId().equals(id)) {
-            throw new RuntimeException("Role sudah ada");
+            throw new RuntimeException("role.already_exists");
         }
         request.setId(id);
         roleRepository.update(request, updatedBy);
@@ -96,10 +96,10 @@ public class RoleService {
     public void deleteRole(Long id) {
         RoleDto existing = roleRepository.findById(id);
         if (existing == null) {
-            throw new RuntimeException("Role tidak ditemukan");
+            throw new RuntimeException("role.not_found");
         }
         if (roleRepository.countUsersByRoleId(id) > 0) {
-            throw new RuntimeException("Role masih digunakan oleh user");
+            throw new RuntimeException("role.still_in_use");
         }
         roleRepository.deleteById(id);
     }
@@ -109,13 +109,13 @@ public class RoleService {
     public List<MenuDto> setRoleMenus(Long roleId, List<Long> menuIds, String createdBy) {
         RoleDto role = roleRepository.findById(roleId);
         if (role == null) {
-            throw new RuntimeException("Role tidak ditemukan");
+            throw new RuntimeException("role.not_found");
         }
 
         // Validasi menu_id ada di database
         for (Long menuId : menuIds) {
             if (menuRepository.findById(menuId) == null) {
-                throw new RuntimeException("Menu tidak ditemukan: id=" + menuId);
+                throw new RuntimeException("menu.not_found");
             }
         }
 
@@ -138,7 +138,7 @@ public class RoleService {
     public List<RoleDto> setUserRoles(Long userId, List<Long> roleIds, String createdBy) {
         for (Long roleId : roleIds) {
             if (roleRepository.findById(roleId) == null) {
-                throw new RuntimeException("Role tidak ditemukan: id=" + roleId);
+                throw new RuntimeException("role.not_found");
             }
         }
         roleRepository.deleteUserRoles(userId);
@@ -178,7 +178,7 @@ public class RoleService {
 
     public MenuDto createMenu(MenuDto request) {
         if (menuRepository.findByCode(request.getCode()) != null) {
-            throw new RuntimeException("Menu code sudah ada");
+            throw new RuntimeException("menu.code_already_exists");
         }
         menuRepository.insert(request);
         return menuRepository.findByCode(request.getCode());
@@ -187,11 +187,11 @@ public class RoleService {
     public MenuDto updateMenu(Long id, MenuDto request) {
         MenuDto existing = menuRepository.findById(id);
         if (existing == null) {
-            throw new RuntimeException("Menu tidak ditemukan");
+            throw new RuntimeException("menu.not_found");
         }
         MenuDto duplicate = menuRepository.findByCode(request.getCode());
         if (duplicate != null && !duplicate.getId().equals(id)) {
-            throw new RuntimeException("Menu code sudah ada");
+            throw new RuntimeException("menu.code_already_exists");
         }
         request.setId(id);
         menuRepository.update(request);
@@ -201,11 +201,11 @@ public class RoleService {
     public void deleteMenu(Long id) {
         MenuDto existing = menuRepository.findById(id);
         if (existing == null) {
-            throw new RuntimeException("Menu tidak ditemukan");
+            throw new RuntimeException("menu.not_found");
         }
         // Kalau parent menu, cek apakah masih punya children
         if (existing.getParentCode() == null && menuRepository.countByParentCode(existing.getCode()) > 0) {
-            throw new RuntimeException("Menu masih memiliki sub-menu");
+            throw new RuntimeException("menu.has_children");
         }
         menuRepository.deleteById(id);
     }
@@ -213,7 +213,7 @@ public class RoleService {
     public MenuDto getMenuById(Long id) {
         MenuDto menu = menuRepository.findById(id);
         if (menu == null) {
-            throw new RuntimeException("Menu tidak ditemukan");
+            throw new RuntimeException("menu.not_found");
         }
         return menu;
     }

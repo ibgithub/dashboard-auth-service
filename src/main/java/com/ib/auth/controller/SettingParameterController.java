@@ -24,21 +24,21 @@ public class SettingParameterController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<SettingParameterDto>>> getAll() {
         List<SettingParameterDto> params = service.getAll();
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Settings fetched successfully", params));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "setting.list.fetched", params));
     }
 
     // GET /api/settings/{id}
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<SettingParameterDto>> getById(@PathVariable Long id) {
         SettingParameterDto param = service.getById(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Setting fetched successfully", param));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "setting.fetched", param));
     }
 
     // GET /api/settings/by-name/{name}
     @GetMapping("/by-name/{name}")
     public ResponseEntity<ApiResponse<SettingParameterDto>> getByName(@PathVariable String name) {
         SettingParameterDto param = service.getByName(name);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Setting fetched successfully", param));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "setting.fetched", param));
     }
 
     // POST /api/settings
@@ -46,7 +46,7 @@ public class SettingParameterController {
     public ResponseEntity<ApiResponse<SettingParameterDto>> create(@RequestBody SettingParameterDto request) {
         String username = getCurrentUsername();
         SettingParameterDto param = service.create(request, username);
-        return ResponseEntity.ok(new ApiResponse<>(true, "CREATED", "Setting created successfully", param));
+        return ResponseEntity.ok(new ApiResponse<>(true, "CREATED", "setting.created", param));
     }
 
     // PUT /api/settings/{id}
@@ -56,14 +56,14 @@ public class SettingParameterController {
             @RequestBody SettingParameterDto request) {
         String username = getCurrentUsername();
         SettingParameterDto param = service.update(id, request, username);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Setting updated successfully", param));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "setting.updated", param));
     }
 
     // DELETE /api/settings/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         service.delete(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Setting deleted successfully", null));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "setting.deleted", null));
     }
 
     private String getCurrentUsername() {

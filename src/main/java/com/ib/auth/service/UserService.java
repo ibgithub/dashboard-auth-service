@@ -109,7 +109,7 @@ public class UserService {
         UserDto user = getById(userId);
 
         if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
-            throw new RuntimeException("Password lama salah");
+            throw new RuntimeException("user.old_password_wrong");
         }
 
         validateNewPassword(dto);
@@ -128,14 +128,14 @@ public class UserService {
     }
     private void validateNewPassword(ChangePasswordDto dto) {
         if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
-            throw new RuntimeException("Password tidak sama");
+            throw new RuntimeException("user.password_mismatch");
         }
     }
 
     public void deleteUser(Long id) {
         UserDto user = userRepository.findProfileById(id);
         if (user == null) {
-            throw new RuntimeException("User tidak ditemukan");
+            throw new RuntimeException("user.not_found");
         }
         userRepository.deleteById(id);
     }
@@ -143,7 +143,7 @@ public class UserService {
     public void unlockUser(Long id) {
         UserDto user = userRepository.findProfileById(id);
         if (user == null) {
-            throw new RuntimeException("User tidak ditemukan");
+            throw new RuntimeException("user.not_found");
         }
         userRepository.updateStatus(id, 1); // ACTIVE
         userRepository.resetLoginFailedCount(id);
@@ -152,7 +152,7 @@ public class UserService {
     public void blockUser(Long id) {
         UserDto user = userRepository.findProfileById(id);
         if (user == null) {
-            throw new RuntimeException("User tidak ditemukan");
+            throw new RuntimeException("user.not_found");
         }
         userRepository.updateStatus(id, 2); // BLOCKED
     }

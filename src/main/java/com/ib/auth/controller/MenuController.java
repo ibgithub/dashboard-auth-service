@@ -26,41 +26,41 @@ public class MenuController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword) {
         PageResult<MenuDto> result = roleService.findMenusPaged(page, size, keyword);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Menus fetched successfully", result));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "menu.list.fetched", result));
     }
 
     // GET /api/menus/all (tanpa paging, untuk checklist di role management)
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<MenuDto>>> getAllMenus() {
         List<MenuDto> menus = roleService.getAllMenus();
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Menus fetched successfully", menus));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "menu.list.fetched", menus));
     }
 
     // GET /api/menus/{id}
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<MenuDto>> getMenuById(@PathVariable Long id) {
         MenuDto menu = roleService.getMenuById(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Menu fetched successfully", menu));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "menu.fetched", menu));
     }
 
     // POST /api/menus
     @PostMapping
     public ResponseEntity<ApiResponse<MenuDto>> createMenu(@RequestBody MenuDto request) {
         MenuDto menu = roleService.createMenu(request);
-        return ResponseEntity.ok(new ApiResponse<>(true, "CREATED", "Menu created successfully", menu));
+        return ResponseEntity.ok(new ApiResponse<>(true, "CREATED", "menu.created", menu));
     }
 
     // PUT /api/menus/{id}
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<MenuDto>> updateMenu(@PathVariable Long id, @RequestBody MenuDto request) {
         MenuDto menu = roleService.updateMenu(id, request);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Menu updated successfully", menu));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "menu.updated", menu));
     }
 
     // DELETE /api/menus/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteMenu(@PathVariable Long id) {
         roleService.deleteMenu(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "Menu deleted successfully", null));
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS", "menu.deleted", null));
     }
 }

@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleAccessDeniedException(
             AccessDeniedException ex) {
         ApiResponse<Void> response = new ApiResponse<>(
-            false, "FORBIDDEN", "Anda tidak memiliki akses ke resource ini", null
+            false, "FORBIDDEN", "auth.access_denied", null
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex) {
         ApiResponse<Void> response = new ApiResponse<>(
-            false, "INTERNAL_ERROR", "Terjadi kesalahan internal", null
+            false, "INTERNAL_ERROR", "error.internal", null
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
