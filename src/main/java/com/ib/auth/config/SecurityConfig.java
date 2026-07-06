@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/roles/**").hasRole("ADMIN")
                         .requestMatchers("/api/permissions/**").hasRole("ADMIN")
                         .requestMatchers("/api/menus/**").hasRole("ADMIN")
+                        .requestMatchers("/api/settings/**").hasRole("ADMIN")
 
                         // User management - hanya ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
