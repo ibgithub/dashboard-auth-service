@@ -148,23 +148,23 @@ public class UserRepository {
         if (user.getPassword() != null) {
             String sql = "update auth.users " +
                     "set first_name = ?, last_name = ?, email = ?, phone_number = ?, " +
-                    "app_lang = ?, updated_by = ?, updated_at = now(), password = ? " +
+                    "app_lang = ?, status = COALESCE(?, status), updated_by = ?, updated_at = now(), password = ? " +
                     "where id = ? ";
             return jdbcTemplate.update(
                     sql,
                     user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(),
-                    user.getAppLang(), user.getUpdatedBy(), user.getPassword(),
+                    user.getAppLang(), user.getStatus(), user.getUpdatedBy(), user.getPassword(),
                     user.getId()
             );
         } else {
             String sql = "update auth.users " +
                     "set first_name = ?, last_name = ?, email = ?, phone_number = ?, " +
-                    "app_lang = ?, updated_by = ?, updated_at = now() " +
+                    "app_lang = ?, status = COALESCE(?, status), updated_by = ?, updated_at = now() " +
                     "where id = ? ";
             return jdbcTemplate.update(
                     sql,
                     user.getFirstName(), user.getLastName(), user.getEmail(), user.getPhoneNumber(),
-                    user.getAppLang(), user.getUpdatedBy(),
+                    user.getAppLang(), user.getStatus(), user.getUpdatedBy(),
                     user.getId()
             );
         }
